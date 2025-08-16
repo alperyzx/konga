@@ -33,10 +33,11 @@ var self = module.exports = {
     sails.log.debug("KongProxyController:req.url", req.url)
     sails.log.debug("KongProxyController:entity", entity)
 
+    // removed this fix as if it's not necessary with Kong 3.x anymore
     // Fix update method by setting it to "PATCH" as Kong requires
-    if (req.method.toLowerCase() === 'put') {
-      req.method = "PATCH";
-    }
+    // if (req.method.toLowerCase() === 'put') {
+    //  req.method = "PATCH";
+    // }
 
 
     if (!req.connection) {

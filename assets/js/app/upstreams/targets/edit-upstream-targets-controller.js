@@ -173,7 +173,8 @@
 
         function setHealth(index, target, healthy) {
           console.log("@@@@@@@@@@@@@@@@@@@@@@@@@");
-          $http.post(`kong/upstreams/${$stateParams.id}/targets/${target.id}/${healthy ? 'healthy' : 'unhealthy'}`)
+          // changed the method to PUT instead of POST, as if kong 3.x requires it
+          $http.put(`kong/upstreams/${$stateParams.id}/targets/${target.id}/${healthy ? 'healthy' : 'unhealthy'}`)
             .then(res => {
               MessageService.success(`Target ${target.target} is set to ${healthy ? 'healthy' : 'unhealthy'}`);
               target.health = healthy ? 'HEALTHY' : 'UNHEALTHY';
