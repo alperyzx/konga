@@ -38,6 +38,41 @@
         }
 
 
+        /**
+         * Whether a plugin matches a free-text search term.
+         *
+         * Kong ships around forty plugins across eight categories, which is
+         * more than the category rail alone makes findable. The key is matched
+         * in both its raw and spaced form so "rate limiting" and
+         * "rate-limiting" behave the same, and the description is searched too
+         * so "token" finds JWT.
+         */
+        function matchesSearch(key, plugin, term) {
+          var needle = (term || '').trim().toLowerCase();
+          if (!needle) return true;
+
+          var haystack = [
+            key,
+            key.split('-').join(' '),
+            (plugin && plugin.description) || ''
+          ].join(' ').toLowerCase();
+
+          return haystack.indexOf(needle) > -1;
+        }
+
+        /** Whether any plugin in a group matches the term. */
+        function groupHasMatch(group, term) {
+          if (!(term || '').trim()) return true;
+
+          return Object.keys(group.plugins).some(function (key) {
+            return matchesSearch(key, group.plugins[key], term);
+          });
+        }
+
+        KongPluginsService.prototype.matchesSearch = matchesSearch;
+        KongPluginsService.prototype.groupHasMatch = groupHasMatch;
+
+
         KongPluginsService.prototype.makePluginGroups = function () {
           return InfoService.getInfo().then(function (resp) {
             var info = resp.data

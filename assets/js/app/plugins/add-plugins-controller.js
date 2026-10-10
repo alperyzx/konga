@@ -21,10 +21,11 @@
         var info = _info.data
         var plugins_available = info.plugins.available_on_server
         console.log("SERVER AVAILABLE PLUGINS => ", plugins_available)
-        var pluginOptions = new KongPluginsService().pluginOptions()
+        var kongPlugins = new KongPluginsService()
+        var pluginOptions = kongPlugins.pluginOptions()
 
         $scope.pluginOptions = pluginOptions
-        new KongPluginsService().makePluginGroups().then(function (groups) {
+        kongPlugins.makePluginGroups().then(function (groups) {
           $scope.pluginGroups = groups
           $log.debug("Plugin Groups", $scope.pluginGroups)
 
@@ -38,8 +39,10 @@
           syncPlugins(_plugins.data.data)
         })
         $scope.activeGroup = 'Authentication'
+        $scope.pluginSearch = ''
         $scope.setActiveGroup = setActiveGroup
         $scope.filterGroup = filterGroup
+        $scope.pluginMatches = pluginMatches
         $scope.onAddPlugin = onAddPlugin
 
         $scope.alert = {
@@ -66,7 +69,17 @@
         }
 
         function filterGroup(group) {
+          // A search spans the whole catalogue rather than the open category:
+          // you browse by tab, but you look up by name.
+          if (($scope.pluginSearch || '').trim()) {
+            return kongPlugins.groupHasMatch(group, $scope.pluginSearch)
+          }
+
           return group.name == $scope.activeGroup
+        }
+
+        function pluginMatches(key, plugin) {
+          return kongPlugins.matchesSearch(key, plugin, $scope.pluginSearch)
         }
 
         function onAddPlugin(name) {

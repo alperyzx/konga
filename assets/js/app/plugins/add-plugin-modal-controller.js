@@ -25,14 +25,15 @@
           $scope[_context.name] = _context.data;
         }
 
-        var pluginOptions = new KongPluginsService().pluginOptions()
+        var kongPlugins = new KongPluginsService()
+        var pluginOptions = kongPlugins.pluginOptions()
         $scope.pluginOptions = pluginOptions
 
         // Define the plugins that will have their own custom form
         // so that it can be included via ng-include in the .html files
         $scope.customPluginForms = ['statsd', 'response-ratelimiting', 'acme'];
 
-        new KongPluginsService().makePluginGroups().then(function (groups) {
+        kongPlugins.makePluginGroups().then(function (groups) {
           $scope.pluginGroups = groups
 
           // Remove ssl plugin if Kong > 0.9.x
@@ -69,8 +70,10 @@
         });
 
 
+        $scope.pluginSearch = ''
         $scope.setActiveGroup = setActiveGroup
         $scope.filterGroup = filterGroup
+        $scope.pluginMatches = pluginMatches
         $scope.onAddPlugin = onAddPlugin
         $scope.close = function () {
           return $uibModalInstance.dismiss()
@@ -88,7 +91,17 @@
         }
 
         function filterGroup(group) {
+          // A search spans the whole catalogue rather than the open category:
+          // you browse by tab, but you look up by name.
+          if (($scope.pluginSearch || '').trim()) {
+            return kongPlugins.groupHasMatch(group, $scope.pluginSearch);
+          }
+
           return group.name === $scope.activeGroup;
+        }
+
+        function pluginMatches(key, plugin) {
+          return kongPlugins.matchesSearch(key, plugin, $scope.pluginSearch);
         }
 
         function onAddPlugin(name) {

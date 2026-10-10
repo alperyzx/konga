@@ -9,12 +9,23 @@
     </div>
 </div>
 <div class="row">
+    <div class="col-md-12 margin-bottom">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="mdi mdi-magnify"></i></span>
+            <input type="text"
+                   class="form-control"
+                   data-ng-model="pluginSearch"
+                   placeholder="search plugins...">
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-12">
         <ul class="nav nav-pills">
             <li
                     role="presentation"
                     data-ng-click="setActiveGroup(group.name)"
-                    ng-class="{'active' : activeGroup == group.name}"
+                    ng-class="{'active' : activeGroup == group.name && !pluginSearch.trim()}"
                     data-ng-repeat="group in pluginGroups">
                 <a class="">{{group.name}}</a>
             </li>
@@ -32,13 +43,20 @@
         <hr>
     </div>
 
-    <div class="col-md-3"  data-ng-repeat="(key,value) in group.plugins">
+    <div class="col-md-3"
+         data-ng-repeat="(key,value) in group.plugins"
+         data-ng-if="pluginMatches(key, value)">
         <div class="panel"
              ng-class="{'panel-default': !value.isAdded,'panel-success': value.isAdded,'panel-disabled': value.isAdded && !value.enabled}">
 
             <div class="panel-body text-center">
                 <div class="center-block">
                     <h5 class="capitalize margin-bottom no-wrap elipsize" uib-tooltip="{{key.split('-').join(' ')}}">{{key.split('-').join(" ")}}</h5>
+                    <p class="margin-bottom" data-ng-if="value.isAdded">
+                        <span class="label" ng-class="value.enabled ? 'label-success' : 'label-default'">
+                            {{value.enabled ? 'enabled' : 'disabled'}}
+                        </span>
+                    </p>
                     <img ng-src="images/kong/plugins/{{key}}.png"
                          onerror="this.src='images/kong/plugins/kong.svg'"
                          class="img-responsive" style="margin: auto;height: 72px;">
@@ -54,4 +72,12 @@
         </div>
     </div>
     <div class="clearfix"></div>
+</div>
+
+<div class="row" data-ng-if="pluginGroups && !(pluginGroups | filter : filterGroup).length">
+    <div class="col-md-12">
+        <p class="help-block text-center" style="padding: 24px">
+            No plugins match &ldquo;{{pluginSearch}}&rdquo;.
+        </p>
+    </div>
 </div>

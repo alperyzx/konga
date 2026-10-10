@@ -140,64 +140,6 @@
               }
             },
           })
-          .state('services.plugins.manage', {
-            url: '/manage',
-            data: {
-              pageName: "Manage Service Plugins",
-              displayName: "manage"
-            },
-            views: {
-              'content@': {
-                templateUrl: 'js/app/services/views/plugins/manage/manage-service-plugins.html',
-                controller: 'ManageServicePluginsController',
-                resolve: {
-                  _service: [
-                    '$stateParams',
-                    'ServiceService',
-                    '$log',
-                    function resolve(
-                      $stateParams,
-                      ServiceService,
-                      $log
-                    ) {
-                      return ServiceService.findById($stateParams.service_id)
-                    }
-                  ],
-                  _plugins: [
-                    '$stateParams',
-                    'ServiceService',
-                    '$log',
-                    function resolve(
-                      $stateParams,
-                      ServiceService,
-                      $log
-                    ) {
-                      return ServiceService.plugins($stateParams.service_id)
-                    }
-                  ],
-                  _info: [
-                    '$stateParams',
-                    'InfoService',
-                    '$log',
-                    function resolve(
-                      $stateParams,
-                      InfoService,
-                      $log
-                    ) {
-                      return InfoService.getInfo()
-                    }
-                  ],
-                  _activeNode: [
-                    'NodesService',
-                    function resolve(NodesService) {
-
-                      return NodesService.isActiveNodeSet()
-                    }
-                  ],
-                }
-              }
-            },
-          })
       }
     ])
   ;
