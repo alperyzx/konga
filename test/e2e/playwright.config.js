@@ -29,6 +29,15 @@ module.exports = defineConfig({
       name: 'static',
       testMatch: /.*\.static\.spec\.js/,
     },
+    // The same assertions the `static` project makes against checked-in
+    // fixtures, re-run against whatever Kong is actually running. Needs Kong
+    // but no browser and no login, so it carries no `use` block and no
+    // dependency — this is what catches a Kong upgrade adding a field type the
+    // renderer has never seen.
+    {
+      name: 'schema',
+      testMatch: /.*\.schema\.spec\.js/,
+    },
     {
       name: 'setup',
       testMatch: /auth\.setup\.js/,

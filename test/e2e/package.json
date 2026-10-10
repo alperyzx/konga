@@ -6,6 +6,7 @@
   "scripts": {
     "test": "playwright test",
     "test:static": "playwright test --project=static",
+    "test:schema": "playwright test --project=schema",
     "test:ui": "playwright test --project=ui",
     "report": "playwright show-report"
   },

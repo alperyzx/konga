@@ -29,10 +29,6 @@
         var pluginOptions = kongPlugins.pluginOptions()
         $scope.pluginOptions = pluginOptions
 
-        // Define the plugins that will have their own custom form
-        // so that it can be included via ng-include in the .html files
-        $scope.customPluginForms = ['statsd', 'response-ratelimiting', 'acme'];
-
         kongPlugins.makePluginGroups().then(function (groups) {
           $scope.pluginGroups = groups
 

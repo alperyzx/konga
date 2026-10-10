@@ -31,7 +31,7 @@
         {{errors.config}}
     </div>
 
-    <!--<form ng-if="customPluginForms.indexOf(plugin.name) < 0" class="form-horizontal">-->
+    <!--<form class="form-horizontal">-->
 
         <!--<div data-ng-if="!data.no_consumer" class="form-group">-->
             <!--<label class="col-sm-4 control-label"><strong>consumer</strong></label>-->
@@ -238,6 +238,6 @@
             <!--</div>-->
         <!--</div>-->
     <!--</form>-->
-    <div  ng-if="customPluginForms.indexOf(plugin.name) < 0" data-ng-include="'js/app/plugins/forms/default.html?r=' + Date.now()"></div>
-    <div ng-if="customPluginForms.indexOf(plugin.name) > -1" data-ng-include="'js/app/plugins/forms/' + plugin.name + '.html?r=' + Date.now()"></div>
+    <!-- See add-plugin-modal.html: one generic form, no per-plugin overrides. -->
+    <div data-ng-include="'js/app/plugins/forms/default.html?r=' + Date.now()"></div>
 </div>
