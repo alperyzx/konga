@@ -65,19 +65,6 @@ var self = module.exports = {
     // Apply monkey patches
     if (['post', 'put', 'patch'].indexOf(req.method.toLowerCase()) > -1) {
 
-      if (req.body && req.body.orderlist) {
-        for (var i = 0; i < req.body.orderlist.length; i++) {
-          try {
-            req.body.orderlist[i] = parseInt(req.body.orderlist[i])
-          } catch (err) {
-            return res.badRequest({
-              body: {
-                message: 'Ordelist entities must be integers'
-              }
-            });
-          }
-        }
-      }
     }
 
     // Apply before Hooks

@@ -6,14 +6,14 @@
 (function () {
   'use strict';
 
-  angular.module('frontend.apis')
+  angular.module('frontend.plugins')
     .controller('AddPluginModalController', [
       '_', '$scope', '$rootScope', '$log',
-      '$state', 'ApiService', 'ConsumerService', 'ServiceService', 'RoutesService','MessageService', 'DialogService', 'Semver',
+      '$state', 'ConsumerService', 'ServiceService', 'RoutesService','MessageService', 'DialogService', 'Semver',
       'KongPluginsService', 'PluginsService', '$uibModal', '$uibModalInstance',
       '_context',
       function controller(_, $scope, $rootScope, $log,
-                          $state, ApiService, ConsumerService, ServiceService, RoutesService, MessageService, DialogService, Semver,
+                          $state, ConsumerService, ServiceService, RoutesService, MessageService, DialogService, Semver,
                           KongPluginsService, PluginsService, $uibModal, $uibModalInstance,
                           _context) {
 
@@ -150,18 +150,6 @@
         }
 
         function getExistingPlugins() {
-
-          if ($scope.api) {
-            ApiService.plugins($scope.api.id)
-              .then(function (response) {
-                $scope.existingPlugins = response.data.data.map(function (item) {
-                  return item.name;
-                });
-              })
-              .catch(function (err) {
-
-              });
-          }
 
           if ($scope.consumer) {
             ConsumerService.listPlugins($scope.consumer.id)

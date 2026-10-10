@@ -153,27 +153,6 @@
 
         </div>
     </div>
-    <div class="form-group" ng-if="compareKongVersion('0.12.0') < 0" ng-class="{'has-error' : errors.orderlist}">
-        <label class="col-sm-3 control-label">Orderlist
-            <br><em><small class="help-block">optional</small></em></label>
-        <div class="col-sm-8">
-            <chips ng-model="upstream.orderlist">
-                <chip-tmpl>
-                    <div class="default-chip">
-                        {{chip}}
-                        <i class="mdi mdi-close" remove-chip></i>
-                    </div>
-                </chip-tmpl>
-                <input chip-control/>
-            </chips>
-            <div class="text-danger" ng-if="errors.orderlist" data-ng-bind="errors.orderlist"></div>
-            <p class="help-block">
-                A list of sequential, but randomly ordered, integer numbers that determine the distribution of the slots in the balancer. If omitted it will be generated. If given, it must have exactly <code>slots</code> number of entries.
-            </p>
-
-        </div>
-    </div>
-
     <!-- ACTIVE HEALTH CHECKS -->
     <div class="col col-12 margin-bottom padding clickable" style="background-color: #eaeaea" ng-click="showActiveHealthChecks = !showActiveHealthChecks">
         <h5 class="no-margin no-padding">

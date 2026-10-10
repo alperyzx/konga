@@ -8,10 +8,10 @@
 
   angular.module('frontend.plugins')
     .controller('AddPluginController', [
-      '_', '$scope', '$rootScope', '$log', '$state', 'ListConfig', 'ApiService',
+      '_', '$scope', '$rootScope', '$log', '$state', 'ListConfig',
       'MessageService', 'ConsumerModel', 'ServiceService', 'DialogService', 'SocketHelperService', 'PluginHelperService',
       'KongPluginsService', '$uibModalInstance', 'PluginsService', '_pluginName', '_schema', '_context',
-      function controller(_, $scope, $rootScope, $log, $state, ListConfig, ApiService,
+      function controller(_, $scope, $rootScope, $log, $state, ListConfig,
                           MessageService, ConsumerModel, ServiceService, DialogService, SocketHelperService, PluginHelperService,
                           KongPluginsService, $uibModalInstance, PluginsService, _pluginName, _schema,_context) {
 

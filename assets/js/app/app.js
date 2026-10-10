@@ -20,7 +20,6 @@
     'frontend.certificates',
     'frontend.users',
     'frontend.consumers',
-    'frontend.apis',
     'frontend.connections',
     'frontend.snapshots',
     'frontend.cluster',

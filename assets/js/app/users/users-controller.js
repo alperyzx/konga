@@ -9,10 +9,10 @@
   angular.module('frontend.users')
     .controller('UsersController', [
       '_','$scope', '$q','$log', 'SocketHelperService', 'MessageService',
-        'UserService','$state','ApiService','$uibModal',
+        'UserService','$state','$uibModal',
         'DialogService','UserModel','ListConfig','_items','_count',
       function controller(_,$scope, $q,$log,SocketHelperService, MessageService,
-                          UserService, $state, ApiService, $uibModal,
+                          UserService, $state, $uibModal,
                           DialogService,UserModel,ListConfig, _items, _count ) {
 
 
