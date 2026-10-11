@@ -38,6 +38,23 @@
                 </p>
             </div>
         </div>
+        <div class="form-group" ng-class="{'has-error' : errors.tags}">
+            <label class="col-sm-4 control-label">Tags
+                <br><em><small class="help-block">optional</small></em></label>
+            <div class="col-sm-7">
+                <chips ng-model="item.tags">
+                    <chip-tmpl>
+                        <div class="default-chip">
+                            {{chip}}
+                            <i class="mdi mdi-close" remove-chip></i>
+                        </div>
+                    </chip-tmpl>
+                    <input chip-control/>
+                </chips>
+                <div class="text-danger" ng-if="errors.tags" data-ng-bind="errors.tags"></div>
+                <p class="help-block">Optional tags for filtering and identification.</p>
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-7">
                 <button type="submit" class="btn btn-primary btn-block" ng-click="submit()">
