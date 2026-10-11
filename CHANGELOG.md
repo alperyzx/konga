@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.15.0]
+* Added Kong 3.x upstream fields, including load-balancing algorithm, host header, SRV-name support, health thresholds, and target tags.
+* Added schema-driven entity support and Kong 3.x plugin schema coverage.
+* Added CA Certificates, Key Sets, Keys, and Vaults management.
+* Added Tag Browser, deployment capability visibility, runtime log-level control, and Prometheus metrics viewing.
+* Fixed route chip conversion for headers, IPv4/IPv6 sources, destinations, malformed input, and round-trip editing.
+* Added a native legacy-environment launcher and LDAP implementation documentation.
+
 ## [0.14.9](https://github.com/pantsel/konga/releases/tag/0.14.9)
 * Fix security issue that allowed a user to escalate to admin status. (Kudos to [j3ssie](https://github.com/j3ssie)).
 * Fix XSS vulnerabity on alerts and notifications. (Kudos to [j3ssie](https://github.com/j3ssie)).
@@ -212,7 +220,6 @@ No data or settings will be lost.
 
 
  
-
 
 
 
