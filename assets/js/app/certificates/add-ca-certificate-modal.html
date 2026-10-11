@@ -1,0 +1,25 @@
+<div class="modal-header primary">
+    <h5 class="modal-title" id="modal-title">Add CA Certificate
+        <a class="modal-close pull-right" ng-click="close()"><i class="mdi mdi-close"></i></a>
+    </h5>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="alert alert-danger" ng-if="errorMessage || errors.message">{{errorMessage || errors.message}}</div>
+    <div class="form-group" ng-class="{'has-error': errors.cert}">
+        <label class="control-label">Certificate <em><small class="help-block">required</small></em></label>
+        <textarea ng-model="data.cert" class="form-control" rows="12" spellcheck="false"></textarea>
+        <div class="text-danger" ng-if="errors.cert" ng-bind="errors.cert"></div>
+        <p class="help-block">Paste a PEM-encoded CA certificate.</p>
+    </div>
+    <div class="form-group" ng-class="{'has-error': errors.tags}">
+        <label class="control-label">Tags <em><small class="help-block">optional</small></em></label>
+        <chips ng-model="data.tags">
+            <chip-tmpl><div class="default-chip">{{chip}} <i class="mdi mdi-close" remove-chip></i></div></chip-tmpl>
+            <input ng-model-control data-ng-keypress="onTagInputKeyPress($event)" ng-model="$tag" />
+        </chips>
+        <div class="text-danger" ng-if="errors.tags" ng-bind="errors.tags"></div>
+    </div>
+    <button type="button" class="btn btn-primary btn-block" ng-disabled="busy" ng-click="submit()">
+        <i class="mdi mdi-check"></i> Submit CA Certificate
+    </button>
+</div>

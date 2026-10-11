@@ -1,0 +1,51 @@
+<div class="row actions">
+    <div class="col-md-12">
+        <div class="pull-left">
+            <a class="btn btn-default" ui-sref="certificates">
+                <i class="mdi mdi-arrow-left"></i> Certificates
+            </a>
+            <a class="btn btn-primary" ng-if="user.hasPermission('certificates','create')"
+               ng-click="openAddCaCertificateModal()">
+                <i class="mdi mdi-plus"></i> Add CA Certificate
+            </a>
+        </div>
+        <list-search class="pull-right" data-filters="filters"
+                     data-options="itemsPerPageOptions" data-items="itemsPerPage"></list-search>
+    </div>
+</div>
+
+<konga-loader ng-if="loading && !items.length"></konga-loader>
+<div class="row" ng-if="!loading || items.length">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <tr>
+                    <th ng-repeat="item in titleItems | filter:titleFilter">
+                        <a ng-if="item.column" class="clickable" ng-click="changeSort(item)">{{item.title.toUpperCase()}}</a>
+                        <span ng-if="!item.column">{{item.title.toUpperCase()}}</span>
+                    </th>
+                    <th width="1" ng-if="user.hasPermission('certificates','delete')"></th>
+                </tr>
+                <tr dir-paginate="item in items.data | orderBy:sort.column:sort.direction | filter:filters.searchWord | itemsPerPage:itemsPerPage">
+                    <td>{{item.id}}</td>
+                    <td><code>{{item.cert_digest || '-'}}</code></td>
+                    <td>
+                        <span class="badge badge-tag badge-success badge-inverse" ng-repeat="tag in item.tags">
+                            <i class="mdi mdi-tag"></i>&nbsp;{{tag}}
+                        </span>
+                    </td>
+                    <td>{{moment(item.created_at * 1000).format("MMM DD YYYY @HH:mm")}}</td>
+                    <td ng-if="user.hasPermission('certificates','delete')">
+                        <button type="button" ng-click="deleteItem($index,item)" class="btn btn-danger btn-link">
+                            <i class="mdi mdi-delete"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+                <tr ng-if="(!items.data || !items.data.length) && !loading">
+                    <td colspan="100%" class="text-center text-muted"><em>No CA certificates found...</em></td>
+                </tr>
+            </table>
+        </div>
+        <dir-pagination-controls class="pull-right"></dir-pagination-controls>
+    </div>
+</div>
