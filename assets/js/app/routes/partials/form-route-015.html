@@ -110,6 +110,11 @@
       </chip-tmpl>
       <input chip-control />
     </chips>
+    <div
+      class="text-danger"
+      ng-if="errors.headers"
+      data-ng-bind="errors.headers"
+    ></div>
     <p class="help-block">
       One or more lists of values indexed by header name that will cause this
       Route to match if present in the request. The <code>Host</code> header cannot be used
@@ -307,6 +312,11 @@
       </chip-tmpl>
       <input chip-control />
     </chips>
+    <div
+      class="text-danger"
+      ng-if="errors.sources"
+      data-ng-bind="errors.sources"
+    ></div>
     <p class="help-block">
       A list of IP sources of incoming connections that match this Route when
       using stream routing. Each entry is an object with fields “ip” (optionally
@@ -337,6 +347,11 @@
       </chip-tmpl>
       <input chip-control />
     </chips>
+    <div
+      class="text-danger"
+      ng-if="errors.destinations"
+      data-ng-bind="errors.destinations"
+    ></div>
     <p class="help-block">
       A list of IP destinations of incoming connections that match this Route
       when using stream routing. Each entry is an object with fields “ip”

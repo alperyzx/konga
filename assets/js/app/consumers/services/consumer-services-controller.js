@@ -9,9 +9,9 @@
   angular.module('frontend.consumers')
     .controller('ConsumerServicesController', [
       '_', '$scope', '$q','$stateParams', '$log', '$state', '$uibModal', 'DialogService', 'MessageService',
-      'ConsumerService', 'ApiModel', 'ListConfig', 'UserService', 'PluginsService','ServiceModel',
+      'ConsumerService', 'ListConfig', 'UserService', 'PluginsService','ServiceModel',
       function controller(_, $scope,$q, $stateParams, $log, $state, $uibModal, DialogService, MessageService,
-                          ConsumerService, ApiModel, ListConfig, UserService, PluginsService,ServiceModel) {
+                          ConsumerService, ListConfig, UserService, PluginsService,ServiceModel) {
 
 
         ServiceModel.setScope($scope, false, 'items', 'itemCount');

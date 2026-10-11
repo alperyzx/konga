@@ -142,64 +142,6 @@
                 }
             },
         })
-        .state('routes.plugins.manage', {
-            url: '/manage',
-            data : {
-                pageName : "Manage Route Plugins",
-                displayName : "manage"
-            },
-            views: {
-                'content@': {
-                    templateUrl: 'js/app/routes/views/plugins/manage/manage-route-plugins.html',
-                    controller: 'ManageRoutePluginsController',
-                    resolve : {
-                        _route: [
-                            '$stateParams',
-                            'RoutesService',
-                            '$log',
-                            function resolve(
-                                $stateParams,
-                                RoutesService,
-                                $log
-                            ) {
-                                return RoutesService.findById($stateParams.route_id)
-                            }
-                        ],
-                        _plugins: [
-                            '$stateParams',
-                            'RoutesService',
-                            '$log',
-                            function resolve(
-                                $stateParams,
-                                RoutesService,
-                                $log
-                            ) {
-                                return RoutesService.plugins($stateParams.route_id)
-                            }
-                        ],
-                        _info: [
-                            '$stateParams',
-                            'InfoService',
-                            '$log',
-                            function resolve(
-                                $stateParams,
-                                InfoService,
-                                $log
-                            ) {
-                                return InfoService.getInfo()
-                            }
-                        ],
-                        _activeNode: [
-                            'NodesService',
-                            function resolve(NodesService) {
-
-                                return NodesService.isActiveNodeSet()
-                            }
-                        ],
-                    }
-                }
-            },
-        })
       }
     ])
   ;

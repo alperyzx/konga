@@ -41,15 +41,6 @@
             access: AccessLevels.user
           },
           {
-            state: 'apis',
-            show : function() {
-              return AuthService.isAuthenticated() && $rootScope.Gateway
-            },
-            title: 'APIs',
-            icon : 'mdi-cloud-outline',
-            access: AccessLevels.user
-          },
-          {
             state: 'consumers',
             show : function() {
               return AuthService.isAuthenticated() && $rootScope.Gateway
@@ -84,6 +75,11 @@
             },
             title: 'Certificates',
             access: AccessLevels.anon
+          },
+          {
+            state: 'key-sets', icon: 'mdi-key-chain',
+            show: function() { return AuthService.isAuthenticated() && $rootScope.Gateway; },
+            title: 'Keys', access: AccessLevels.user
           }
         ];
       }

@@ -1,0 +1,29 @@
+<!--
+  One nested schema field: its label, its control, and its help text, stacked.
+
+  The top level of the form does not use this — default.html lays those fields
+  out horizontally. Everything below the top level comes through here, at any
+  depth, via schema-control.html including this file back.
+-->
+<div class="plugin-nested-field">
+    <label>
+        <i class="mdi mdi-chevron-right"></i>{{humanizeLabel($node.label)}}
+        <span class="text-danger" ng-if="$node.required">*</span>
+    </label>
+
+    <div data-ng-include="SCHEMA_CONTROL_TPL"></div>
+
+    <p class="help-block no-margin" ng-if="$node.help">{{$node.help}}</p>
+
+    <p class="help-block no-margin" ng-if="$node.referenceable">
+        <i class="mdi mdi-key-variant"></i>
+        Accepts a vault reference, e.g. <code>{vault://env/my-secret}</code>.
+    </p>
+
+    <p class="text-warning no-margin" ng-if="$node.deprecation">
+        <i class="mdi mdi-alert"></i>
+        Deprecated<span ng-if="$node.deprecation.removal_in_version">, removed in
+        Kong {{$node.deprecation.removal_in_version}}</span>.
+        {{$node.deprecation.message}}
+    </p>
+</div>

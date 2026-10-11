@@ -15,7 +15,7 @@
         <button type="button" class="close" ng-click="errors.config=null" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         {{errors.config}}
     </div>
-    <!--<form ng-if="customPluginForms.indexOf(pluginName) < 0" class="form-horizontal">-->
+    <!--<form class="form-horizontal">-->
         <!--<div data-ng-if="!data.no_consumer && !consumer" class="form-group">-->
             <!--<label class="col-sm-4 control-label"><strong>consumer</strong></label>-->
             <!--<div class="col-sm-7">-->
@@ -219,6 +219,8 @@
         <!--</div>-->
     <!--</form>-->
 
-    <div  ng-if="customPluginForms.indexOf(pluginName) < 0" data-ng-include="'js/app/plugins/forms/default.html?r=' + Date.now()"></div>
-    <div ng-if="customPluginForms.indexOf(pluginName) > -1" data-ng-include="'js/app/plugins/forms/' + pluginName + '.html?r=' + Date.now()"></div>
+    <!-- One form for every plugin. The hand-written per-plugin overrides are
+         gone: the renderer now draws maps, nested records at any depth and
+         array-of-record rows, which is the only reason they existed. -->
+    <div data-ng-include="'js/app/plugins/forms/default.html?r=' + Date.now()"></div>
 </div>

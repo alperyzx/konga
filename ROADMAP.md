@@ -2,6 +2,22 @@
 
 This file contains the development roadmap for the upcoming release of KONGA, as well as the project backlog.
 
+## Kong Manager parity update — October 2026
+
+The current parity implementation is complete through Phase 6. The work was tested against
+Kong 3.9.3 (traditional-compatible router, Postgres, WASM disabled) and the Konga UI was
+rebuilt, restarted, and checked with Playwright after each completed slice.
+
+- Phase 1: retired the obsolete APIs module and Kong 3.x dead code.
+- Phase 2: added the schema-driven renderer improvements and coverage tests.
+- Phase 3: added Kong 3.x upstream fields, health thresholds, SRV-name support, and target tags.
+- Phase 4: added CA Certificates, Key Sets, Keys, and Vaults.
+- Phase 5: added Tag Browser, deployment capability visibility, and existing operations visibility.
+- Phase 6: added runtime log-level control and Prometheus metrics viewing.
+
+The latest parity commit is `c5012df`. The static suite currently passes 105 tests. The unrelated
+route-chip work remains separate and uncommitted.
+
 &nbsp;
 &nbsp;
 

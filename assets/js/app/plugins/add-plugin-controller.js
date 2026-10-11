@@ -1,19 +1,22 @@
 /**
- * This file contains all necessary Angular controller definitions for 'frontend.admin.login-history' module.
+ * Controller for the "add plugin" modal.
  *
- * Note that this file should only contain controllers and nothing else.
+ * The form itself is generic: SchemaFormService turns Kong's schema into an
+ * ordered tree of nodes, forms/default.html renders it to whatever depth the
+ * schema goes, and serialize() turns it back into a config object. This
+ * controller only has to decide what the plugin is attached to.
  */
 (function () {
   'use strict';
 
   angular.module('frontend.plugins')
     .controller('AddPluginController', [
-      '_', '$scope', '$rootScope', '$log', '$state', 'ListConfig', 'ApiService',
-      'MessageService', 'ConsumerModel', 'ServiceService', 'DialogService', 'SocketHelperService', 'PluginHelperService',
-      'KongPluginsService', '$uibModalInstance', 'PluginsService', '_pluginName', '_schema', '_context',
-      function controller(_, $scope, $rootScope, $log, $state, ListConfig, ApiService,
-                          MessageService, ConsumerModel, ServiceService, DialogService, SocketHelperService, PluginHelperService,
-                          KongPluginsService, $uibModalInstance, PluginsService, _pluginName, _schema,_context) {
+      '_', '$scope', '$rootScope', '$log', '$state',
+      'MessageService', 'PluginHelperService', 'SchemaFormService',
+      'KongPluginsService', '$uibModalInstance', '_pluginName', '_schema', '_context',
+      function controller(_, $scope, $rootScope, $log, $state,
+                          MessageService, PluginHelperService, SchemaFormService,
+                          KongPluginsService, $uibModalInstance, _pluginName, _schema, _context) {
 
 
         if(_.isArray(_context)) {
@@ -26,75 +29,49 @@
 
         $scope.context = 'create';
 
-        //var pluginOptions = new KongPluginsService().pluginOptions()
         var options = new KongPluginsService().pluginOptions(_pluginName)
 
-
-        var sch = _schema.data;
-        $scope.schema = {
-          fields: {}
-        };
-
-        if(_.isArray(sch.fields)) {
-          sch.fields.forEach(item => {
-            $scope.schema.fields[Object.keys(item)[0]] = item[Object.keys(item)[0]];
-          })
-        }
-
-
-        // $scope.schema = _schema.data
         $scope.pluginName = _pluginName
-        console.log("Schema", $scope.schema)
-        //$log.debug("Options", options)
         $scope.close = close
 
-        // Define the plugins that will have their own custom form
-        // so that it can be included via ng-include in the .html files
-        $scope.customPluginForms = ['statsd', 'response-ratelimiting', 'acme'];
+        // The recursive field templates include each other, so their URLs are
+        // resolved once here rather than built inline. Konga busts the template
+        // cache with `?r=` + a timestamp; an expression like that re-evaluated
+        // inside a recursive ng-include would mint a new URL on every digest at
+        // every level and never settle.
+        var cacheBust = '?r=' + Date.now();
+        $scope.SCHEMA_FIELD_TPL = 'js/app/plugins/forms/schema-field.html' + cacheBust;
+        $scope.SCHEMA_CONTROL_TPL = 'js/app/plugins/forms/schema-control.html' + cacheBust;
 
         $scope.humanizeLabel = function (key) {
           return key.split("_").join(" ");
         }
 
+        // Map and array-of-record editors add and remove rows from the node
+        // tree. Child scopes inherit these, so they work at any depth.
+        $scope.schemaForm = {
+          addEntry: function (node) {
+            node.entries.push(SchemaFormService.newEntry(node));
+          },
+          addRow: function (node) {
+            node.rows.push(SchemaFormService.newRow(node));
+          },
+          removeAt: SchemaFormService.removeAt
+        };
 
         function initialize() {
-          // Initialize plugin fields data
-          $scope.data = _.merge(options.fields, $scope.schema)
+          $scope.data = {consumer: {}};
 
-          // Define general modal window content
-          $scope.description = $scope.data.meta ? $scope.data.meta.description
+          $scope.description = options.fields && options.fields.meta
+            ? options.fields.meta.description
             : 'Configure the Plugin.'
 
-          // Remove unwanted data fields that start with "_"
-          Object.keys($scope.data.fields).forEach(function (key) {
-            if (key.startsWith("_")) delete $scope.data.fields[key];
-          })
-
-          // Customize data fields according to plugin
-          PluginHelperService.customizeDataFieldsForPlugin(_pluginName, $scope.data.fields)
-
-          // Assign extra properties from options to data fields
-          PluginHelperService.assignExtraProperties(_pluginName, options, $scope.data.fields);
-
-          console.log("Extra properties added to fields =>", $scope.data.fields);
+          // Kong's legacy /plugins/schema/<name> returns the config fields
+          // already unwrapped, as an ordered array of single-key objects.
+          $scope.nodes = SchemaFormService.normalize(_schema.data.fields, options);
+          SchemaFormService.applyDefaults($scope.nodes);
         }
 
-
-        $scope.addCustomField = function (obj) {
-          if (!obj.custom_field) {
-            return;
-          }
-          if (!obj.custom_fields) {
-            obj.custom_fields = {};
-          }
-
-          obj.custom_fields[obj.custom_field] = _.cloneDeep(obj.schema.fields)
-          obj.custom_field = "";
-        }
-
-        $scope.removeCustomField = function (object, key) {
-          delete object.custom_fields[key]
-        }
 
         $scope.addPlugin = function (back) {
 
@@ -141,42 +118,15 @@
             };
           }
 
-          // Apply monkey patches to request data if needed
-          PluginHelperService.applyMonkeyPatches(request_data, $scope.data.fields)
-
-          // Create request data "config." properties
-          var config = PluginHelperService.createConfigProperties(request_data.name,$scope.data.fields)
-
-          request_data = _.merge(request_data, config || {})
-
-          // Delete unset fields
-          Object.keys(request_data).forEach(function (key) {
-            if (!request_data[key]) delete request_data[key]
-          })
-
-          console.log("request_data.config", request_data.config)
-
-          // Delete unset config fields
-          if(request_data.config) {
-            Object.keys(request_data.config).forEach(function (key) {
-              if (!request_data.config[key] ||
-                  (Array.isArray(request_data.config[key]) && !request_data.config[key].length) ||
-                  (_.isObject(request_data.config[key]) &&
-                      (Object.values(request_data.config[key]).every(v => v == null))))
-                delete request_data.config[key]
-            })
-          }
-
-
-
-
-          console.log("REQUEST DATA =>", request_data)
-
+          // serialize() already drops what the user left unset — and, unlike
+          // the code this replaces, keeps `false` and `0`, which are values
+          // rather than absences.
+          var config = SchemaFormService.serialize($scope.nodes);
+          if (!SchemaFormService.isUnset(config)) request_data.config = config;
 
           PluginHelperService.addPlugin(
             request_data,
             function success(res) {
-              console.log("create plugin", res)
               $scope.busy = false;
               $rootScope.$broadcast('plugin.added', res.data)
               MessageService.success('Plugin added successfully!')
@@ -204,38 +154,10 @@
 
 
             }, function evt(event) {
-              // Only used for ssl plugin certs upload
               var progressPercentage = parseInt(100.0 * event.loaded / event.total);
               $log.debug('progress: ' + progressPercentage + '% ' + event.config.data.file.name);
             })
         }
-
-
-        // Initialize used title items
-        $scope.titleItems = ListConfig.getTitleItems(ConsumerModel.endpoint);
-
-        // Add the consumers to the plugin options
-        $scope.getConsumer = function (val) {
-
-          if (!val) return;
-
-          var commonParameters = {
-            where: SocketHelperService.getWhere({
-              searchWord: val,
-              columns: $scope.titleItems
-            })
-          };
-
-          return ConsumerModel
-            .load(_.merge({}, commonParameters, {
-              limit: 5
-            }))
-            .then(function (response) {
-              return response.map(function (item) {
-                return item;
-              });
-            });
-        };
 
         function close() {
           $uibModalInstance.dismiss()
@@ -243,85 +165,6 @@
 
 
         initialize();
-
-        /**
-         * -----------------------------------------------------------------------------------
-         * CUSTOM FORMS LOGIC ADDITIONS
-         * -----------------------------------------------------------------------------------
-         */
-
-        /**
-         * STATSD
-         */
-
-        $scope.statsd = {
-          metricNames : [
-            'request_count',
-            'request_size',
-            'response_size',
-            'latency',
-            'status_count',
-            'unique_users',
-            'request_per_user',
-            'upstream_latency',
-            'kong_latency',
-            'status_count_per_user'
-          ],
-          statTypes : [
-            'gauge',
-            'timer',
-            'counter',
-            'histogram',
-            'meter',
-            'set'
-          ],
-          consumerIndentifiers : [
-            'consumer_id',
-            'custom_id',
-            'username'
-          ],
-          addMetric : function (metrics) {
-
-            var template = {
-              name : 'upstream_latency',
-              stat_type: 'gauge',
-              custom_identifier: 'consumer_id'
-            };
-
-            metrics.push(template);
-
-          },
-          removeMetric: function (metrics, index) {
-            metrics.splice(index,1);
-          }
-        };
-
-        $scope.getFieldProp = (field) => {
-          return Object.keys(field)[0];
-        }
-
-        /**
-         * RESPONSE RATE LIMITING
-         */
-
-        $scope.addMap = (obj) => {
-
-          DialogService.prompt('Add Limit', 'Enter key', (keyName) => {
-            if(!obj.value) {
-              obj.value = {}
-            }
-
-            obj.value[keyName] = {};
-            obj.values.fields.forEach(field => {
-              obj.value[keyName][Object.keys(field)[0]] = null
-            })
-          })
-
-        }
-
-        $scope.removeMap = (keyName, obj) => {
-          delete obj.value[keyName];
-        }
       }
     ]);
 }());

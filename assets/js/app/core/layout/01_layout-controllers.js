@@ -251,6 +251,15 @@
             access: AccessLevels.admin
           },
           {
+            state: 'tags',
+            show: function () {
+              return AuthService.isAuthenticated() && $rootScope.Gateway
+            },
+            title: 'Tag Browser',
+            icon: 'mdi-tag-multiple',
+            access: AccessLevels.user
+          },
+          {
             state: 'services',
             show: function () {
               return AuthService.hasPermission('services', 'read') && $rootScope.isGatewayVersionEqOrGreater('0.13.0')

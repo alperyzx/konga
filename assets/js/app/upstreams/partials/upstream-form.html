@@ -36,6 +36,47 @@
     </div>
     <!--/ TAGS -->
 
+    <!-- LOAD BALANCER -->
+    <div class="form-group" ng-class="{'has-error' : errors.algorithm}">
+        <label class="col-sm-3 control-label">Algorithm
+            <br><em><small class="help-block">optional</small></em>
+        </label>
+        <div class="col-sm-8">
+            <select ng-model="upstream.algorithm" class="form-control">
+                <option value="round-robin">round-robin</option>
+                <option value="consistent-hashing">consistent-hashing</option>
+                <option value="least-connections">least-connections</option>
+                <option value="latency">latency</option>
+            </select>
+            <div class="text-danger" ng-if="errors.algorithm" data-ng-bind="errors.algorithm"></div>
+            <p class="help-block">The load-balancing algorithm used to select a target. Defaults to <code>round-robin</code>.</p>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error' : errors.host_header}">
+        <label class="col-sm-3 control-label">Host header
+            <br><em><small class="help-block">optional</small></em>
+        </label>
+        <div class="col-sm-8">
+            <input ng-model="upstream.host_header" class="form-control">
+            <div class="text-danger" ng-if="errors.host_header" data-ng-bind="errors.host_header"></div>
+            <p class="help-block">Host header to send to targets. When unset, Kong uses the target hostname.</p>
+        </div>
+    </div>
+
+    <div class="form-group" ng-class="{'has-error' : errors.use_srv_name}">
+        <label class="col-sm-3 control-label">Use SRV name
+            <br><em><small class="help-block">optional</small></em>
+        </label>
+        <div class="col-sm-8">
+            <input bs-switch type="checkbox" ng-model="upstream.use_srv_name"
+                   switch-size="small" switch-on-text="YES" switch-off-text="NO">
+            <div class="text-danger" ng-if="errors.use_srv_name" data-ng-bind="errors.use_srv_name"></div>
+            <p class="help-block">Use the SRV record name for the Host header instead of the resolved target address.</p>
+        </div>
+    </div>
+    <!--/ LOAD BALANCER -->
+
     <!-- has_on -->
     <div class="form-group" ng-if="compareKongVersion('0.12.0') >= 0" ng-class="{'has-error' : errors.hash_on}">
         <label class="col-sm-3 control-label">Hash on
@@ -153,27 +194,17 @@
 
         </div>
     </div>
-    <div class="form-group" ng-if="compareKongVersion('0.12.0') < 0" ng-class="{'has-error' : errors.orderlist}">
-        <label class="col-sm-3 control-label">Orderlist
-            <br><em><small class="help-block">optional</small></em></label>
-        <div class="col-sm-8">
-            <chips ng-model="upstream.orderlist">
-                <chip-tmpl>
-                    <div class="default-chip">
-                        {{chip}}
-                        <i class="mdi mdi-close" remove-chip></i>
-                    </div>
-                </chip-tmpl>
-                <input chip-control/>
-            </chips>
-            <div class="text-danger" ng-if="errors.orderlist" data-ng-bind="errors.orderlist"></div>
-            <p class="help-block">
-                A list of sequential, but randomly ordered, integer numbers that determine the distribution of the slots in the balancer. If omitted it will be generated. If given, it must have exactly <code>slots</code> number of entries.
-            </p>
 
+    <div class="form-group" ng-class="{'has-error' : errors['healthchecks.threshold']}">
+        <label class="col-sm-3 control-label">Health threshold
+            <br><em><small class="help-block">optional</small></em>
+        </label>
+        <div class="col-sm-8">
+            <input type="number" ng-model="upstream.healthchecks.threshold" class="form-control">
+            <div class="text-danger" ng-if="errors['healthchecks.threshold']" data-ng-bind="errors['healthchecks.threshold']"></div>
+            <p class="help-block">Minimum percentage of healthy targets required for the upstream to be considered healthy.</p>
         </div>
     </div>
-
     <!-- ACTIVE HEALTH CHECKS -->
     <div class="col col-12 margin-bottom padding clickable" style="background-color: #eaeaea" ng-click="showActiveHealthChecks = !showActiveHealthChecks">
         <h5 class="no-margin no-padding">

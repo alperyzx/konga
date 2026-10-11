@@ -14,5 +14,42 @@
     <div class="col-md-12">
         <div json-human="Gateway" class="table-responsive"></div>
     </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>CAPABILITIES</strong></div>
+            <div class="panel-body">
+                <span class="label label-success margin-right">Kong {{Gateway.version}}</span>
+                <span class="label label-default margin-right">Role: {{Gateway.configuration.role || 'unknown'}}</span>
+                <span class="label label-default margin-right">Router: {{Gateway.configuration.router_flavor || 'unknown'}}</span>
+                <span class="label label-default margin-right">Database: {{Gateway.configuration.database || 'unknown'}}</span>
+                <span class="label" ng-class="Gateway.configuration.wasm ? 'label-success' : 'label-default'">
+                    WASM {{Gateway.configuration.wasm ? 'enabled' : 'disabled'}}
+                </span>
+                <span class="label margin-left"
+                      ng-class="Gateway.configuration.loaded_vaults ? 'label-success' : 'label-default'">
+                    Vaults {{Gateway.configuration.loaded_vaults ? 'available' : 'unavailable'}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>RUNTIME LOG LEVEL</strong></div>
+            <div class="panel-body">
+                <select class="form-control" ng-model="logLevel" ng-options="level for level in logLevels"></select>
+                <button class="btn btn-primary margin-top" ng-click="saveLogLevel()" ng-disabled="logBusy">Update log level</button>
+                <span class="text-danger" ng-if="logError">{{logError}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>METRICS</strong></div>
+            <div class="panel-body">
+                <button class="btn btn-default" ng-click="showMetrics()" ng-disabled="metricsBusy">Load Prometheus metrics</button>
+                <pre ng-if="metrics" style="max-height:240px;overflow:auto;margin-top:10px">{{metrics}}</pre>
+                <span class="text-danger" ng-if="metricsError">{{metricsError}}</span>
+            </div>
+        </div>
+    </div>
 </div>
-

@@ -23,6 +23,14 @@
                   })
               },
 
+              getTags : function() {
+                  return $http.get('kong/tags')
+              },
+
+              getLogLevel: function() { return $http.get('kong/debug/node/log-level'); },
+              setLogLevel: function(level) { return $http.put('kong/debug/node/log-level', {level: level}); },
+              getMetrics: function() { return $http.get('kong/metrics'); },
+
               clusterStatus : function() {
                   return $http.get('kong/cluster')
               },

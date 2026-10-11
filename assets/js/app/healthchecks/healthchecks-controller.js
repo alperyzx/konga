@@ -8,9 +8,9 @@
 
   angular.module('frontend.healthchecks')
     .controller('HealthChecksController', [
-      '$scope', '$rootScope', '$log', '$state', 'ApiService', '$uibModal', 'DialogService', 'UserService', '$q', '$ngBootbox',
+      '$scope', '$rootScope', '$log', '$state', '$uibModal', 'DialogService', 'UserService', '$q', '$ngBootbox',
       'MessageService', 'SocketHelperService', '$http', 'Semver', '$timeout', 'ApiHealthCheck', 'ListConfig',
-      function controller($scope, $rootScope, $log, $state, ApiService, $uibModal, DialogService, UserService, $q, $ngBootbox,
+      function controller($scope, $rootScope, $log, $state, $uibModal, DialogService, UserService, $q, $ngBootbox,
                           MessageService, SocketHelperService, $http, Semver, $timeout, ApiHealthCheck, ListConfig) {
 
         ApiHealthCheck.setScope($scope, false, 'items', 'itemCount');
@@ -137,17 +137,6 @@
               function onSuccess(response) {
                 console.log(response)
                 $scope.items = response;
-
-                // Check if the all apis still exist
-                $scope.items.forEach(function (item) {
-                  ApiService.findById(item.api_id).then(function (result) {
-                  }).catch(function (error) {
-                    if (error.status === 404) {
-                      item.isOrphaned = true;
-                    }
-                  });
-                });
-
               }
             );
 

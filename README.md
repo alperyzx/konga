@@ -16,6 +16,7 @@ _Konga is not an official app. No affiliation with [Kong](https://www.konghq.com
 - [**Configuration**](#configuration)
 - [**Environment variables**](#environment-variables)
 - [**Running Konga**](#running-konga)
+- [**Local development helper**](#local-development-helper)
 - [**Upgrading**](#upgrading)
 - [**FAQ**](#faq)
 - [**More Kong related stuff**](#more-kong-related-stuff)
@@ -124,6 +125,23 @@ In order to use them, set the appropriate env vars in your `.env` file.
 $ npm start
 ```
 Konga GUI will be available at `http://localhost:1337`
+
+### Local development helper
+
+This fork includes [`run.sh`](run.sh) for running the legacy Node.js application directly on
+the host. It checks the supported Node.js range, installs npm/Bower dependencies when needed,
+and starts Konga on port `1337`.
+
+```bash
+./run.sh                 # install missing dependencies, then start Konga
+./run.sh --install       # reinstall/update npm and Bower dependencies first
+./run.sh --production    # start with NODE_ENV=production
+./run.sh --prepare postgres postgresql://user:pass@localhost:5432/konga
+```
+
+Konga is available at `http://localhost:1337`. The Kong Admin API connection is configured
+inside Konga; the development setup used for parity testing is Kong at `localhost:8001` and
+the Kong Manager at `localhost:8002`.
 
 ### Production
 

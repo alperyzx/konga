@@ -698,6 +698,35 @@ pre {
   }
 }
 
+// The schema renderer recurses to whatever depth Kong uses — five levels, on
+// 3.9.3 — so nesting has to stay readable. Repeating the grey block at every
+// level does not: by depth three it is one undifferentiated slab. Only the
+// outermost block paints a background; deeper ones use a rule and indentation.
+.plugin-field-table .plugin-field-table {
+  background-color: transparent !important;
+  padding: 0;
+}
+
+// One nested field: its label, control and help text.
+.plugin-nested-field {
+  margin-bottom: 12px;
+  padding-left: 10px;
+  border-left: 2px solid darken($gray-lighter, 8%);
+
+  > label {
+    margin-bottom: 2px;
+  }
+}
+
+// One entry of a map, or one row of an array of records.
+.plugin-map-entry {
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background-color: $gray-lighter;
+  border: 1px solid darken($gray-lighter, 6%);
+  border-radius: 4px;
+}
+
 .default-chip{
   padding-left: 15px;
   padding-right: 2px;

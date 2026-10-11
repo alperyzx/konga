@@ -1,7 +1,11 @@
 (function () {
   'use strict';
 
-  angular.module('frontend.plugins', []);
+  // `angular.chips` supplies the <chips> control the schema renderer uses for
+  // array/set-of-string fields. It was previously relied on without being
+  // declared, which happened to work because directive registration is
+  // injector-global.
+  angular.module('frontend.plugins', ['angular.chips']);
 
   // Module configuration
   angular.module('frontend.plugins')

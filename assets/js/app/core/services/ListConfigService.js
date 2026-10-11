@@ -577,6 +577,41 @@
               inTitle: true
             }
           ],
+          ca_certificate: [
+            {
+              title: 'id',
+              column: 'id',
+              searchable: true,
+              sortable: true,
+              inSearch: true,
+              inTitle: true
+            },
+            {
+              title: 'cert digest',
+              column: 'cert_digest',
+              searchable: true,
+              sortable: true,
+              inSearch: true,
+              inTitle: true
+            },
+            {
+              title: 'tags',
+              column: 'tags',
+              searchable: true,
+              sortable: true,
+              inSearch: true,
+              inTitle: true
+            },
+            {
+              title: 'Created',
+              column: 'created_at',
+              class: 'col-xs-2',
+              searchable: false,
+              sortable: false,
+              inSearch: false,
+              inTitle: true
+            }
+          ],
           userlogin: [
             {
               title: 'IP-address',

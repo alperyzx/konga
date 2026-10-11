@@ -1,0 +1,144 @@
+<!--
+  The control for one normalised schema node, and nothing else — no label, no
+  help text. Those live in schema-field.html, because the top level of the form
+  lays them out horizontally and every nested level stacks them.
+
+  This template and schema-field.html include each other to walk the schema to
+  whatever depth Kong uses (five, on 3.9.3). Both URLs come from scope
+  constants, never inline string concatenation: the surrounding code busts the
+  template cache with `?r=' + Date.now()`, and an expression like that
+  re-evaluated inside a recursive include mints a new URL on every digest at
+  every level, so $templateRequest never settles.
+
+  The node shape is SchemaFormService.normalize(); `$node.control` is resolved
+  there so this switch stays flat.
+-->
+<div ng-switch on="$node.control">
+
+    <!-- A nested record. `$node in $node.fields` is deliberate: ngRepeat
+         evaluates the collection against the scope it was linked to, where
+         $node is still this record, and only then shadows $node in the child
+         scope it creates per field. -->
+    <div ng-switch-when="record">
+        <div class="plugin-field-table">
+            <div data-ng-repeat="$node in $node.fields" data-ng-include="SCHEMA_FIELD_TPL"></div>
+        </div>
+    </div>
+
+    <!-- key -> string. This is the shape that used to render as
+         <input type="map">: a text box that accepted anything and sent Kong
+         something it would reject. -->
+    <div ng-switch-when="map-scalar">
+        <div class="row no-margin-left margin-bottom" data-ng-repeat="entry in $node.entries">
+            <div class="col-md-5">
+                <input type="text" class="form-control" ng-model="entry.key" placeholder="key">
+            </div>
+            <div class="col-md-6">
+                <input type="text" class="form-control" ng-model="entry.value" placeholder="value">
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-sm btn-link btn-danger"
+                        ng-click="schemaForm.removeAt($node.entries, $index)">
+                    <i class="mdi mdi-delete"></i>
+                </button>
+            </div>
+        </div>
+        <button type="button" class="btn btn-link btn-sm" ng-click="schemaForm.addEntry($node)">
+            <i class="mdi mdi-plus"></i>&nbsp;add entry
+        </button>
+    </div>
+
+    <!-- key -> record. Each entry owns its own cloned subtree, so editing one
+         row cannot write through to the others. -->
+    <div ng-switch-when="map-record">
+        <div class="well plugin-map-entry" data-ng-repeat="entry in $node.entries">
+            <div class="row no-margin-left">
+                <div class="col-md-11">
+                    <input type="text" class="form-control" ng-model="entry.key" placeholder="key">
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-sm btn-link btn-danger"
+                            ng-click="schemaForm.removeAt($node.entries, $index)">
+                        <i class="mdi mdi-delete"></i>
+                    </button>
+                </div>
+            </div>
+            <div data-ng-repeat="$node in entry.fields" data-ng-include="SCHEMA_FIELD_TPL"></div>
+        </div>
+        <button type="button" class="btn btn-link btn-sm" ng-click="schemaForm.addEntry($node)">
+            <i class="mdi mdi-plus"></i>&nbsp;add entry
+        </button>
+    </div>
+
+    <!-- An array of records, as repeating rows. statsd's `metrics` is the one
+         that used to need a hand-written form. -->
+    <div ng-switch-when="rows">
+        <div class="well plugin-map-entry" data-ng-repeat="row in $node.rows">
+            <button type="button" class="btn btn-sm btn-link btn-danger pull-right"
+                    ng-click="schemaForm.removeAt($node.rows, $index)">
+                <i class="mdi mdi-delete"></i>&nbsp;remove
+            </button>
+            <div class="clearfix"></div>
+            <div data-ng-repeat="$node in row.fields" data-ng-include="SCHEMA_FIELD_TPL"></div>
+        </div>
+        <button type="button" class="btn btn-link btn-sm" ng-click="schemaForm.addRow($node)">
+            <i class="mdi mdi-plus"></i>&nbsp;add {{$node.label}}
+        </button>
+    </div>
+
+    <!-- An array or set of scalars. -->
+    <div ng-switch-when="chips">
+        <chips ng-model="$node.value">
+            <chip-tmpl>
+                <div class="default-chip">
+                    {{chip}}
+                    <i class="mdi mdi-close" remove-chip></i>
+                </div>
+            </chip-tmpl>
+            <input chip-control/>
+        </chips>
+        <p class="help-block">Tip: press <code>Enter</code> to accept a value.</p>
+    </div>
+
+    <!-- Anything with one_of, at any depth. The old template offered a select
+         only for top-level strings, so nested enums were free-text. -->
+    <div ng-switch-when="select">
+        <select class="form-control" ng-model="$node.value"
+                ng-options="choice as choice for choice in $node.one_of">
+            <option value="">-- not set --</option>
+        </select>
+    </div>
+
+    <div ng-switch-when="boolean">
+        <input bs-switch
+               type="checkbox"
+               ng-model="$node.value"
+               switch-size="small"
+               switch-on-text="YES"
+               switch-off-text="NO">
+    </div>
+
+    <div ng-switch-when="number">
+        <input type="number" class="form-control" ng-model="$node.value">
+    </div>
+
+    <div ng-switch-when="string">
+        <textarea class="form-control" ng-model="$node.value" rows="1"></textarea>
+    </div>
+
+    <!-- A type this renderer has not been taught. Shown, loudly, as a notice —
+         never as an input. Silently accepting text for a type Kong will reject
+         is the bug this whole template exists to remove, so the failure mode
+         has to be visible rather than plausible. -->
+    <div ng-switch-default>
+        <p class="text-danger no-margin">
+            <i class="mdi mdi-alert"></i>
+            Konga cannot render a <code>{{$node.type}}</code> field yet, so
+            <strong>{{$node.label}}</strong> is not editable here.
+        </p>
+        <p class="help-block">
+            Set it with Kong's Admin API, and please report this — it means Kong
+            added a field type the renderer needs teaching.
+        </p>
+    </div>
+</div>

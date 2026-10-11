@@ -51,6 +51,38 @@
                             }
                         }
                     })
+                    .state('ca-certificates', {
+                        parent: 'frontend',
+                        url: '/ca-certificates',
+                        data: {
+                            activeNode: true,
+                            pageName: 'CA Certificates',
+                            pageDescription: 'CA certificates used to verify upstream TLS certificates.',
+                            prefix: '<i class="material-icons text-primary">perm_identity</i>'
+                        },
+                        resolve: {
+                            _gateway: [
+                                'InfoService',
+                                '$rootScope',
+                                function (InfoService, $rootScope) {
+                                    return new Promise((resolve) => {
+                                        var watcher = $rootScope.$watch('Gateway', function (newValue) {
+                                            if (newValue) {
+                                                watcher();
+                                                resolve(newValue);
+                                            }
+                                        });
+                                    });
+                                }
+                            ]
+                        },
+                        views: {
+                            'content@': {
+                                templateUrl: 'js/app/certificates/ca-certificates.html',
+                                controller: 'CaCertificatesController'
+                            }
+                        }
+                    })
             }
         ])
     ;

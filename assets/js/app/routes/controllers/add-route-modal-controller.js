@@ -8,9 +8,9 @@
 
   angular.module('frontend.routes')
     .controller('AddRouteModalController', [
-      '_','$scope', '$rootScope', '$log', '$state', 'RoutesService', 'SettingsService',
+      '_','$scope', '$rootScope', '$log', '$state', 'RoutesService', 'RouteChips', 'SettingsService',
       '$uibModalInstance', 'MessageService', '_service',
-      function controller(_, $scope, $rootScope, $log, $state, RoutesService, SettingsService,
+      function controller(_, $scope, $rootScope, $log, $state, RoutesService, RouteChips, SettingsService,
                           $uibModalInstance, MessageService, _service) {
 
 
@@ -43,46 +43,17 @@
 
           clearRoute()
 
-          const data = _.cloneDeep($scope.route)
-
-          // Format sources, destingations and headers
-          if(data.sources && data.sources.length) {
-            data.sources = _.map(data.sources, (item) => {
-              const parts = item.split(":");
-              const obj = {};
-              obj.ip = parts[0]
-              if(parts[1]) obj.port = parseInt(parts[1])
-              return obj;
-            })
+          // Chips -> Kong's record and map shapes. See RouteChips: a chip that
+          // does not follow the documented format is a field error, not a
+          // silent drop and not a throw out of this handler.
+          const formatted = RouteChips.toKong($scope.route);
+          if (!_.isEmpty(formatted.errors)) {
+            $scope.errors = formatted.errors;
+            MessageService.error(_.values(formatted.errors).join(' '));
+            return;
           }
+          const data = formatted.data;
 
-          if(data.destinations && data.destinations.length) {
-            data.destinations = _.map(data.destinations, (item) => {
-              const parts = item.split(":");
-              const obj = {};
-              obj.ip = parts[0]
-              if(parts[1]) obj.port = parseInt(parts[1])
-              return obj;
-            })
-          }
-
-          if(data.headers && data.headers.length) {
-            data.headers = _.map(data.headers, (item) => {
-              const parts = item.split(":");
-              const obj = {};
-              obj[parts[0]] = parts[1].split(",").filter(function (el) {
-                return el;
-              })
-              return obj;
-            }).reduce(function(r, e) {
-              const key = Object.keys(e)[0];
-              const value = e[key];
-              r[key] = value;
-              return r;
-            }, {});
-          }
-
-          console.log("Route =>", data);
           $scope.errorMessage = '';
 
           RoutesService.add(data)
