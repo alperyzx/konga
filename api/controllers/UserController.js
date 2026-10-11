@@ -49,12 +49,13 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
         sails.log(req.body)
 
-        var user = req.body;
+        var user = _.cloneDeep(req.body);
         var passports = req.body.passports
 
         // Delete unwanted properties
         delete user.passports
         delete user.password_confirmation
+        if (_.isObject(user.node)) user.node = user.node.id;
 
 
         sails.models.user

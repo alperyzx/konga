@@ -74,7 +74,7 @@ module.exports = {
 
                 if(!err) {
 
-                    var baseUrl = settings.basePath || (req.protocol || 'http') + "://" + (req.get('host') || (require("ip").address() + ':' + sails.config.port));
+                    var baseUrl = settings.basePath || (req.protocol || 'http') + "://" + (req.get('host') || ('localhost:' + sails.config.port));
 
                     var link = baseUrl +  '/auth/activate/' + user.activationToken;
 

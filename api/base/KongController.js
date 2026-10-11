@@ -1,7 +1,6 @@
 'use strict';
 
 var KongService = require('../services/KongService')
-var unirest = require("unirest")
 
 module.exports = {
 

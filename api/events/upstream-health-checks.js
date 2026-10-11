@@ -5,7 +5,7 @@
 const events = require('events');
 const _ = require('lodash');
 const eventEmitter = new events.EventEmitter();
-const unirest = require('unirest')
+const unirest = require('../lib/http-client')
 const cron = require('node-cron');
 const moment = require('moment')
 const hcmailer = require('nodemailer');

@@ -37,16 +37,6 @@ var datastoreDefinitions = {
     database: process.env.DB_DATABASE || 'konga_database',
     poolSize: process.env.DB_POOLSIZE || 10,
     ssl: Boolean(process.env.DB_SSL)
-  },
-
-  sqlserver: {
-    adapter: 'sails-sqlserver',
-    url: process.env.DB_URI || undefined,
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || undefined,
-    password: process.env.DB_PASSWORD || undefined,
-    port: process.env.DB_PORT || 49150,
-    database: process.env.DB_DATABASE || 'konga_database'
   }
 };
 

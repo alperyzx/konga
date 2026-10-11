@@ -2,7 +2,7 @@
 
 var async = require('async');
 var _ = require('lodash');
-var uuidv4 = require('uuid/v4');
+var uuidv4 = require('uuid').v4;
 var UserSignUp = require("../events/user-events")
 
 /**
@@ -275,6 +275,10 @@ var AuthController = {
   callback: function callback(request, response) {
     sails.services.passport.callback(request, response, function callback(error, user) {
 
+      if (error || !user) {
+        return response.status(401).json(error || {});
+      }
+
       // User must be active
       if (user && !user.active) {
         return response.forbidden({
@@ -283,7 +287,7 @@ var AuthController = {
       }
 
 
-      request.login(user, function callback(error) {
+      request.login(user, {session: false}, function callback(error) {
         // If an error was thrown, redirect the user to the login which should
         // take care of rendering the error messages.
         if (error) {

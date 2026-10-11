@@ -1,6 +1,6 @@
 'use strict';
 
-const unirest = require("unirest")
+const unirest = require('../lib/http-client')
 const ApiHealthCheckService = require('../services/ApiHealthCheckService')
 const JWT = require("./Token");
 const Utils = require('../lib/utils');

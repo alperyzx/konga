@@ -22,5 +22,5 @@
  *
  */
 module.exports = function (grunt) {
-  grunt.registerTask('default', ['compileAssets', 'linkAssetsBuild',  'watch']);
+  grunt.registerTask('default', ['build']);
 };

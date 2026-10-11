@@ -1,6 +1,6 @@
 'use strict';
 
-var unirest = require("unirest")
+var unirest = require('../lib/http-client')
 var async = require('async')
 var fs = require('fs')
 var path = require('path')

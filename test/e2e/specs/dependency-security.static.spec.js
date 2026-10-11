@@ -22,6 +22,14 @@ test.describe('security dependency upgrades', () => {
     expect(controller).toContain("response.serverError(error)");
   });
 
+  test('uses stateless Passport login and normalizes Waterline associations', () => {
+    const authController = read('api/controllers/AuthController.js');
+    const userController = read('api/controllers/UserController.js');
+
+    expect(authController).toContain('request.login(user, {session: false}');
+    expect(userController).toContain('if (_.isObject(user.node)) user.node = user.node.id;');
+  });
+
   test('pins the audited direct dependency upgrades', () => {
     const dependencies = require(path.join(ROOT, 'package.json')).dependencies;
     expect(dependencies.passport).toBe('^0.7.0');
@@ -29,5 +37,10 @@ test.describe('security dependency upgrades', () => {
     expect(dependencies.grunt).toBe('^1.6.3');
     expect(dependencies.sass).toBe('^1.105.1');
     expect(dependencies['node-sass']).toBeUndefined();
+    expect(dependencies.unirest).toBeUndefined();
+    expect(dependencies.ip).toBeUndefined();
+    expect(dependencies['sails-sqlserver']).toBeUndefined();
+    expect(dependencies.uuid).toBe('^11.1.1');
+    expect(dependencies.jsonwebtoken).toBe('^9.0.2');
   });
 });
