@@ -25,5 +25,22 @@
           })
       }
     ])
+    .controller('TagsController', [
+      '$scope', '$log', 'InfoService',
+      function controller($scope, $log, InfoService) {
+        $scope.loading = true;
+        $scope.filters = {searchWord: ''};
+
+        InfoService.getTags().then(function(response) {
+          $scope.tags = response.data.data || [];
+          $scope.loading = false;
+        }, function(error) {
+          $log.error('TagsController: failed to load tags', error);
+          $scope.tags = [];
+          $scope.loading = false;
+          $scope.error = 'Unable to load Kong tags.';
+        });
+      }
+    ])
   ;
 }());

@@ -23,6 +23,10 @@
                   })
               },
 
+              getTags : function() {
+                  return $http.get('kong/tags')
+              },
+
               clusterStatus : function() {
                   return $http.get('kong/cluster')
               },

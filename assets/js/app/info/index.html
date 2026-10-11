@@ -14,5 +14,22 @@
     <div class="col-md-12">
         <div json-human="Gateway" class="table-responsive"></div>
     </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>CAPABILITIES</strong></div>
+            <div class="panel-body">
+                <span class="label label-success margin-right">Kong {{Gateway.version}}</span>
+                <span class="label label-default margin-right">Role: {{Gateway.configuration.role || 'unknown'}}</span>
+                <span class="label label-default margin-right">Router: {{Gateway.configuration.router_flavor || 'unknown'}}</span>
+                <span class="label label-default margin-right">Database: {{Gateway.configuration.database || 'unknown'}}</span>
+                <span class="label" ng-class="Gateway.configuration.wasm ? 'label-success' : 'label-default'">
+                    WASM {{Gateway.configuration.wasm ? 'enabled' : 'disabled'}}
+                </span>
+                <span class="label margin-left"
+                      ng-class="Gateway.configuration.loaded_vaults ? 'label-success' : 'label-default'">
+                    Vaults {{Gateway.configuration.loaded_vaults ? 'available' : 'unavailable'}}
+                </span>
+            </div>
+        </div>
+    </div>
 </div>
-
