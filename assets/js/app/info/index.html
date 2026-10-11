@@ -32,4 +32,24 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>RUNTIME LOG LEVEL</strong></div>
+            <div class="panel-body">
+                <select class="form-control" ng-model="logLevel" ng-options="level for level in logLevels"></select>
+                <button class="btn btn-primary margin-top" ng-click="saveLogLevel()" ng-disabled="logBusy">Update log level</button>
+                <span class="text-danger" ng-if="logError">{{logError}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading"><strong>METRICS</strong></div>
+            <div class="panel-body">
+                <button class="btn btn-default" ng-click="showMetrics()" ng-disabled="metricsBusy">Load Prometheus metrics</button>
+                <pre ng-if="metrics" style="max-height:240px;overflow:auto;margin-top:10px">{{metrics}}</pre>
+                <span class="text-danger" ng-if="metricsError">{{metricsError}}</span>
+            </div>
+        </div>
+    </div>
 </div>

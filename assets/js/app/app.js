@@ -18,6 +18,7 @@
     'frontend.info',
     'frontend.plugins',
     'frontend.certificates',
+    'frontend.security',
     'frontend.users',
     'frontend.consumers',
     'frontend.connections',

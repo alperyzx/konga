@@ -20,6 +20,12 @@
 
           _getInfo()
 
+          $scope.logLevels = ['trace','debug','info','notice','warn','error','crit','alert','emerg'];
+          $scope.loadLogLevel = function() { InfoService.getLogLevel().then(function(r) { $scope.logLevel = (r.data.message || '').replace('log level: ', ''); }); };
+          $scope.saveLogLevel = function() { $scope.logBusy = true; InfoService.setLogLevel($scope.logLevel).then(function() { $scope.logBusy = false; }, function() { $scope.logBusy = false; $scope.logError = 'Unable to update log level.'; }); };
+          $scope.loadLogLevel();
+          $scope.showMetrics = function() { $scope.metricsBusy = true; InfoService.getMetrics().then(function(r) { $scope.metrics = r.data; $scope.metricsBusy = false; }, function() { $scope.metricsError = 'Unable to load metrics.'; $scope.metricsBusy = false; }); };
+
           $scope.$on('user.node.updated',function(node){
               _getInfo()
           })
