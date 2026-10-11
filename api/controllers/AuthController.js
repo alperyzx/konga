@@ -217,9 +217,14 @@ var AuthController = {
    * @param   {Response}  response    Response object
    */
   logout: function logout(request, response) {
-    request.logout();
+    request.logout(function(error) {
+      if (error) {
+        sails.log.error('User logout failed', error);
+        return response.serverError(error);
+      }
 
-    response.json(200, true);
+      response.json(200, true);
+    });
   },
 
   /**
