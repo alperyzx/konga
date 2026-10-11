@@ -14,6 +14,12 @@
                           $uibModalInstance, Upstream, MessageService,_item ) {
 
           $scope.upstream = _item
+          $scope.activeHealthHeaders = []
+          angular.forEach(_.get($scope.upstream, 'healthchecks.active.headers', {}), function (values, name) {
+            $scope.activeHealthHeaders.push({name: name, values: values})
+          })
+          $scope.addActiveHealthHeader = function () { $scope.activeHealthHeaders.push({name: '', values: []}) }
+          $scope.removeActiveHealthHeader = function (index) { $scope.activeHealthHeaders.splice(index, 1) }
 
 
           $scope.close = function() {
@@ -23,7 +29,13 @@
           $scope.submit = function() {
 
               $scope.busy = true
-              Upstream.update($scope.upstream.id,angular.copy($scope.upstream))
+              var data = angular.copy($scope.upstream)
+              var headers = {}
+              $scope.activeHealthHeaders.forEach(function (row) {
+                if (row.name) headers[row.name] = row.values || []
+              })
+              _.set(data, 'healthchecks.active.headers', Object.keys(headers).length ? headers : null)
+              Upstream.update($scope.upstream.id,data)
                   .then(
                       function onSuccess(result) {
                           $log.debug("UpdateUpstreamModalController:created upstream",result)

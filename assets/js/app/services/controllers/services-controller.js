@@ -12,6 +12,7 @@
         $scope = angular.extend($scope, angular.copy(ListConfig.getConfig('service', ServiceModel)));
         $scope.user = UserService.user()
         $scope.toggleStripRequestPathOrUri = toggleStripRequestPathOrUri
+        $scope.toggleServiceEnabled = toggleServiceEnabled
         $scope.isRequestPathOrUriStripped = isRequestPathOrUriStripped
         $scope.openAddServiceModal = openAddServiceModal
         $scope.updateService = updateService
@@ -27,16 +28,29 @@
 
           $scope.loading = true
 
-          ServiceModel.update(id, data)
+          return ServiceService.update(id, data)
             .then(function (res) {
               $log.debug("Update Service: ", res)
               $scope.loading = false
               _fetchData()
+              return res
             }).catch(function (err) {
-            $log.error("Update Service: ", err)
-            $scope.loading = false;
-          });
+              $log.error("Update Service: ", err)
+              $scope.loading = false;
+              throw err
+            });
 
+        }
+
+        function toggleServiceEnabled(service) {
+          var previousValue = service.enabled !== false
+          service.enabled = !previousValue
+
+          return $scope.updateService(service.id, {
+            enabled: service.enabled
+          }).catch(function () {
+            service.enabled = previousValue
+          })
         }
 
         function toggleStripRequestPathOrUri(service) {

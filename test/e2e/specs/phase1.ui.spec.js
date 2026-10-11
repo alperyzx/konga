@@ -114,6 +114,97 @@ test.describe('Every route still loads', () => {
   }
 });
 
+test.describe('Route quick actions', () => {
+  test('Strip Path and Preserve Host persist after a hard reload', async ({ page, context }) => {
+    const routePath = `/routes/${fixtures.route.id}`;
+    const original = (await kong.get(routePath)).body;
+    const cdp = await context.newCDPSession(page);
+
+    await cdp.send('Network.enable');
+    await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+
+    try {
+      await page.goto('/#!/routes');
+      await konga.waitForAngular(page);
+      await page.reload({ waitUntil: 'networkidle' });
+      await konga.waitForAngular(page);
+      await konga.clearErrors(page);
+
+      const row = page.locator('tr').filter({
+        has: page.getByRole('link', { name: fixtures.route.name, exact: true }),
+      });
+      await expect(row).toBeVisible();
+
+      await row.locator('[uib-tooltip="Strip Path"]').click();
+      await expect.poll(async () => (await kong.get(routePath)).body.strip_path)
+        .toBe(!original.strip_path);
+
+      await row.locator('[uib-tooltip="Preserve Host"]').click();
+      await expect.poll(async () => (await kong.get(routePath)).body.preserve_host)
+        .toBe(!original.preserve_host);
+
+      await page.reload({ waitUntil: 'networkidle' });
+      await konga.waitForAngular(page);
+
+      const reloadedRow = page.locator('tr').filter({
+        has: page.getByRole('link', { name: fixtures.route.name, exact: true }),
+      });
+      await expect(reloadedRow.locator('[uib-tooltip="Strip Path"]'))
+        .toHaveClass(original.strip_path ? /text-muted/ : /text-primary/);
+      await expect(reloadedRow.locator('[uib-tooltip="Preserve Host"]'))
+        .toHaveClass(original.preserve_host ? /text-muted/ : /text-primary/);
+      expect(await konga.errors(page)).toEqual([]);
+    } finally {
+      await kong.patch(routePath, {
+        strip_path: original.strip_path,
+        preserve_host: original.preserve_host,
+      });
+      await cdp.send('Network.setCacheDisabled', { cacheDisabled: false });
+    }
+  });
+});
+
+test.describe('Service quick actions', () => {
+  test('Enable/Disable persists after a hard reload', async ({ page, context }) => {
+    const servicePath = `/services/${fixtures.service.id}`;
+    const original = (await kong.get(servicePath)).body;
+    const cdp = await context.newCDPSession(page);
+
+    await cdp.send('Network.enable');
+    await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+
+    try {
+      await page.goto('/#!/services');
+      await konga.waitForAngular(page);
+      await page.reload({ waitUntil: 'networkidle' });
+      await konga.waitForAngular(page);
+      await konga.clearErrors(page);
+
+      const row = page.locator('tr').filter({
+        has: page.getByRole('link', { name: fixtures.service.name, exact: true }),
+      });
+      await expect(row).toBeVisible();
+      await row.locator('[data-service-enabled-toggle]').click();
+
+      await expect.poll(async () => (await kong.get(servicePath)).body.enabled)
+        .toBe(!original.enabled);
+
+      await page.reload({ waitUntil: 'networkidle' });
+      await konga.waitForAngular(page);
+
+      const reloadedRow = page.locator('tr').filter({
+        has: page.getByRole('link', { name: fixtures.service.name, exact: true }),
+      });
+      await expect(reloadedRow.locator('[data-service-enabled-toggle]'))
+        .toHaveAttribute('aria-label', original.enabled ? 'Enable service' : 'Disable service');
+      expect(await konga.errors(page)).toEqual([]);
+    } finally {
+      await kong.patch(servicePath, { enabled: original.enabled });
+      await cdp.send('Network.setCacheDisabled', { cacheDisabled: false });
+    }
+  });
+});
+
 test.describe('AddPluginModalController after the move to frontend.plugins', () => {
   test('creates a service-scoped plugin from the service detail page', async ({ page }) => {
     await page.goto(`/#!/services/${fixtures.service.id}/read`);

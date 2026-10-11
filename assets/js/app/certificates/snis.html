@@ -1,0 +1,16 @@
+<div class="row actions"><div class="col-md-12">
+  <button class="btn btn-primary" ng-click="open()"><i class="mdi mdi-plus"></i> Add SNI</button>
+  <a class="btn btn-default" ui-sref="certificates">Certificates</a>
+  <list-search class="pull-right" data-filters="filters" data-options="itemsPerPageOptions" data-items="itemsPerPage"></list-search>
+</div></div>
+<div class="row"><div class="col-md-12"><table class="table table-striped table-hover">
+  <tr><th>Name</th><th>Certificate</th><th>Tags</th><th>Created</th><th></th><th></th></tr>
+  <tr dir-paginate="item in items.data | filter:filters.searchWord | itemsPerPage:itemsPerPage">
+    <td>{{item.name}}</td><td><code>{{item.certificate.id || item.certificate}}</code></td>
+    <td><span class="badge badge-tag" ng-repeat="tag in item.tags">{{tag}}</span></td>
+    <td>{{item.created_at * 1000 | date}}</td>
+    <td><button class="btn btn-warning btn-link" ng-click="open(item)"><i class="mdi mdi-pencil"></i> Edit</button></td>
+    <td><button class="btn btn-danger btn-link" ng-click="remove($index,item)"><i class="mdi mdi-delete"></i> Delete</button></td>
+  </tr>
+  <tr ng-if="!items.data.length"><td colspan="6" class="text-center text-muted">No SNIs found.</td></tr>
+</table><dir-pagination-controls class="pull-right"></dir-pagination-controls></div></div>

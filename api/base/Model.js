@@ -9,6 +9,14 @@ module.exports = {
   schema: true,
 
   attributes: {
+    createdAt: {
+      type: 'number',
+      autoCreatedAt: true
+    },
+    updatedAt: {
+      type: 'number',
+      autoUpdatedAt: true
+    },
     // Relation to User object via created user id
     createdUser: {
       model: 'User',

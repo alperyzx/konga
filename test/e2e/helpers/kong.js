@@ -33,6 +33,7 @@ const kong = {
 
   get: (p) => request('GET', p),
   post: (p, b) => request('POST', p, b),
+  patch: (p, b) => request('PATCH', p, b),
   del: (p) => request('DELETE', p),
 
   /** Kong's version, so specs can skip anything version-gated. */
@@ -86,13 +87,22 @@ async function createFixtures() {
  * consumer they hang off.
  */
 async function cleanupFixtures() {
+  const services = (await kong.get('/services')).body;
+  const prefixedServiceIds = new Set(
+    ((services && services.data) || [])
+      .filter((service) => (service.name || '').startsWith(PREFIX))
+      .map((service) => service.id)
+  );
+
   for (const collection of ['routes', 'services', 'upstreams', 'consumers']) {
     const { body } = await kong.get(`/${collection}`);
     if (!body || !body.data) continue;
 
     for (const entity of body.data) {
       const label = entity.name || entity.username || '';
-      if (label.startsWith(PREFIX)) {
+      const referencesFixtureService = collection === 'routes' && entity.service &&
+        prefixedServiceIds.has(entity.service.id);
+      if (label.startsWith(PREFIX) || referencesFixtureService) {
         await kong.del(`/${collection}/${entity.id}`);
       }
     }

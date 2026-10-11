@@ -1,7 +1,7 @@
 # Konga browser tests
 
-Regression tests for the Konga admin UI, covering Phase 1 (the removal of the
-APIs module) and Phase 2 (the schema-driven plugin form).
+Regression tests for the Konga admin UI and the completed Kong 3.9 parity plan,
+covering Phases 1–10 plus runtime and dependency-security regressions.
 
 This is a **separate npm package** on purpose. The published container is a
 `--production` install and has no test runner in it. Keeping the suite here
@@ -19,11 +19,24 @@ No browser is downloaded — the config runs against your installed Chrome
 (`channel: 'chrome'`). Set `PW_CHANNEL=msedge` or `PW_CHANNEL=chromium` to use
 something else.
 
+## Docker build tests
+
+From the repository root, the dedicated Docker target runs the backend endpoint
+suite and all static parity checks in the same Node/Alpine environment used to
+build the runtime image:
+
+```bash
+docker build --target test -t konga:0.26.10-test .
+```
+
+Browser and live-schema projects still run outside that image because they test
+the running Konga and Kong services over their published ports.
+
 ## The three suites
 
 | Project  | Needs a browser | Needs Konga | Needs Kong | What it covers |
 | -------- | --------------- | ----------- | ---------- | -------------- |
-| `static` | no              | no          | no         | Source-tree guards: the retired module stays retired, every DI annotation matches its function's arity, every `templateUrl` resolves, all four plugin pickers keep the same affordances, and `SchemaFormService` round-trips every plugin schema in `fixtures/`. |
+| `static` | no              | no          | no         | Source-tree guards for all parity phases: dependency/runtime compatibility, retired modules, DI annotations, templates, route chips, Kong entities and operations, plugin pickers, and schema round-trips. |
 | `schema` | no              | no          | yes        | The same round-trip, re-run against the gateway that is actually up. |
 | `ui`     | yes             | yes         | yes        | The app logged in: routing, the injector, plugin creation end-to-end against a real Kong, the plugin picker's search and enabled badge, and the generated plugin form. |
 
@@ -135,13 +148,12 @@ a crashed run leaves obviously-disposable litter that the next run clears.
 
 ## Editing `assets/` invalidates a UI run
 
-Sails 0.12 does not serve `assets/`. It serves `.tmp/public/`, a copy grunt
-makes at lift time. Grunt's watch task does not see macOS fsevents through a
-Docker bind mount, so an edit to `assets/` changes nothing the browser can
-reach:
+Sails 1 serves `.tmp/public/`, a copy Grunt creates from `assets/`. The obsolete
+watch task has been removed, so rebuild assets and restart Konga after an asset change:
 
 ```bash
-docker restart konga
+npm run build
+# restart the running Konga process
 ```
 
 Without it the suite passes happily against the previous snapshot — a green run
@@ -155,4 +167,4 @@ curl -s localhost:1337/js/app/services/views/add-service-plugin-modal.html | gre
 Konga also serves every static asset with `Cache-Control: public, max-age=31536000`
 and busts the cache on only two of its `templateUrl`s. The Playwright runner
 launches a fresh profile each time so the suite is immune, but a browser you
-have been clicking around in is not — hard-reload it.
+have been clicking around in is not—hard-reload it with cache disabled.

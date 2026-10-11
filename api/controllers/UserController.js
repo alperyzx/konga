@@ -70,28 +70,31 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                   return  res.json()
                 }
 
+                function respondWithUser() {
+                    if(!passports) return res.json(user)
+
+                    sails.models.passport
+                        .update({user:req.param('id')},{password:passports.password})
+                        .fetch()
+                        .exec(function(err){
+                            if(err) return res.negotiate(err);
+                            return res.json(user)
+                        })
+                }
+
                 if(user.node) {
-                    sails.models.kongnode
+                    return sails.models.kongnode
                         .findOne({id : user.node})
                         .exec(function(err,node){
                             if(err) return res.negotiate(err)
                             user.node = node;
                             sails.sockets.blast('user.' + user.id + '.updated', user);
+                            return respondWithUser()
                         })
-                }else{
-                    sails.sockets.blast('user.' + user.id + '.updated', user);
                 }
 
-
-                if(!passports) return res.json(user)
-
-                sails.models.passport
-                    .update({user:req.param('id')},{password:passports.password})
-                    .fetch()
-                    .exec(function(err,updatedPassport){
-                        if(err) return res.negotiate(err);
-                        return  res.json(user)
-                    })
+                sails.sockets.blast('user.' + user.id + '.updated', user);
+                return respondWithUser()
 
 
 

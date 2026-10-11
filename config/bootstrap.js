@@ -1,6 +1,7 @@
 'use strict';
 
 var fs = require('fs')
+var path = require('path')
 
 module.exports.bootstrap = function bootstrap(next) {
     /**
@@ -11,12 +12,13 @@ module.exports.bootstrap = function bootstrap(next) {
 
 
     // Create Konga data directories
-    var dirs = [( process.env.STORAGE_PATH || './kongadata/' ), ( process.env.STORAGE_PATH || './kongadata/' )+ 'uploads']
+    var storagePath = process.env.STORAGE_PATH || './kongadata/'
+    var dirs = [storagePath, path.join(storagePath, 'uploads')]
 
 
     dirs.forEach(function(dir){
         if (!fs.existsSync(dir)){
-            fs.mkdirSync(dir);
+            fs.mkdirSync(dir, { recursive: true });
         }
     })
 

@@ -15,6 +15,18 @@
 
 
         $scope.context = 'update';
+        $scope.activeHealthHeaders = [];
+        $scope.addActiveHealthHeader = function () { $scope.activeHealthHeaders.push({name: '', values: []}); };
+        $scope.removeActiveHealthHeader = function (index) { $scope.activeHealthHeaders.splice(index, 1); };
+
+        var initializedHeaders = false;
+        $scope.$watch('upstream', function (upstream) {
+          if (!upstream || initializedHeaders) return;
+          angular.forEach(_.get(upstream, 'healthchecks.active.headers', {}), function (values, name) {
+            $scope.activeHealthHeaders.push({name: name, values: values});
+          });
+          initializedHeaders = true;
+        });
 
         $scope.onTagInputKeyPress = function ($event) {
           if($event.keyCode === 13) {
@@ -28,6 +40,11 @@
 
           $scope.busy = true
           var data = angular.copy($scope.upstream);
+          var headers = {};
+          $scope.activeHealthHeaders.forEach(function (row) {
+            if (row.name) headers[row.name] = row.values || [];
+          });
+          _.set(data, 'healthchecks.active.headers', Object.keys(headers).length ? headers : null);
           fixHealthChecksHttpStatusesType(data);
           delete data.data; // Kong 1.x related bug
           Upstream.update($scope.upstream.id, data)

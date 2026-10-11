@@ -2,13 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.15.0]
+## [0.26.10]
+* Migrated the runtime to Sails 1 and Node.js 20.19+, including Passport 0.7 and Waterline compatibility fixes.
+* Added model timestamps and corrected filtered count parsing, fixing error toasts on Users, Connections, Snapshots, and other sorted list pages.
+* Fixed Kong connection creation and user-node association handling for Sails 1 response shapes.
 * Added Kong 3.x upstream fields, including load-balancing algorithm, host header, SRV-name support, health thresholds, and target tags.
+* Completed Kong Manager field parity for service TLS trust, route buffering, advanced upstream hashing and probe headers.
+* Added alternate certificate pairs and standalone tagged SNI management.
+* Completed create/edit workflows for Key Sets, Keys, and Vaults, including key names, JWK handling, key-set references, and Env vault configuration.
+* Consolidated parity navigation under Certificates and Keys & Vaults to keep the sidebar usable.
 * Added schema-driven entity support and Kong 3.x plugin schema coverage.
 * Added CA Certificates, Key Sets, Keys, and Vaults management.
 * Added Tag Browser, deployment capability visibility, runtime log-level control, and Prometheus metrics viewing.
 * Fixed route chip conversion for headers, IPv4/IPv6 sources, destinations, malformed input, and round-trip editing.
+* Fixed the Route list Strip Path and Preserve Host quick actions to persist partial updates through Kong's PATCH API.
+* Added Service enable/disable controls to the Services list and create/edit forms.
 * Added a native legacy-environment launcher and LDAP implementation documentation.
+* Modernized the asset build and test tooling while retaining the AngularJS interface.
+* Replaced the vulnerable Git-based HTTP client with a native Fetch/FormData implementation and upgraded audited runtime dependencies.
+* Added local compatibility packages for abandoned transitive dependencies and removed obsolete Grunt watcher, `ip`, `unirest`, and SQL Server support.
+* Reached `0` known vulnerabilities in `npm audit`.
+* Added runtime coverage for every registered HTTP endpoint, authenticated list/count coverage for every model-backed API, and HTTP-client unit tests.
+* Isolated backend tests in an in-memory datastore so test runs never erase local users or Kong connections.
+* Corrected local datastore configuration to persist records under `STORAGE_PATH` (default `./kongadata/`).
+* Added valid standalone 404/500 pages and expanded hard-reload Playwright verification against Kong 3.9.3.
+* Reworked the Docker image into test/build/runtime stages, added non-root execution, excluded local data from the build context, and restored production WebSocket, onboarding, and storage-path compatibility.
+
+### Breaking changes
+* Node.js versions older than `20.19.0` are no longer supported.
+* The SQL Server datastore adapter has been removed; supported external adapters are MongoDB, MySQL, and PostgreSQL.
 
 ## [0.14.9](https://github.com/pantsel/konga/releases/tag/0.14.9)
 * Fix security issue that allowed a user to escalate to admin status. (Kudos to [j3ssie](https://github.com/j3ssie)).
@@ -220,8 +242,3 @@ No data or settings will be lost.
 
 
  
-
-
-
-
-

@@ -25,9 +25,11 @@ test.describe('security dependency upgrades', () => {
   test('uses stateless Passport login and normalizes Waterline associations', () => {
     const authController = read('api/controllers/AuthController.js');
     const userController = read('api/controllers/UserController.js');
+    const nodeController = read('api/controllers/KongNodeController.js');
 
     expect(authController).toContain('request.login(user, {session: false}');
     expect(userController).toContain('if (_.isObject(user.node)) user.node = user.node.id;');
+    expect(nodeController).toContain('return res.created(_node[0]);');
   });
 
   test('pins the audited direct dependency upgrades', () => {

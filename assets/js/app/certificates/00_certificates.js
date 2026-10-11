@@ -83,6 +83,22 @@
                             }
                         }
                     })
+                    .state('snis', {
+                        parent: 'frontend',
+                        url: '/snis',
+                        data: {
+                            activeNode: true,
+                            pageName: 'SNIs',
+                            pageDescription: 'Map TLS hostnames to Kong certificates.',
+                            prefix: '<i class="material-icons text-primary">security</i>'
+                        },
+                        views: {
+                            'content@': {
+                                templateUrl: 'js/app/certificates/snis.html',
+                                controller: 'SnisController'
+                            }
+                        }
+                    })
             }
         ])
     ;

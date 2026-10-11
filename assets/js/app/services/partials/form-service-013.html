@@ -7,6 +7,19 @@
     </div>
 </div>
 
+<div class="form-group" ng-if="service.enabled !== undefined || isGatewayVersionEqOrGreater('3.4.0')">
+    <label class="col-sm-4 control-label">Enabled</label>
+    <div class="col-sm-7">
+        <input bs-switch
+               type="checkbox"
+               ng-model="service.enabled"
+               switch-size="small"
+               switch-on-text="ENABLED"
+               switch-off-text="DISABLED">
+        <p class="help-block">Disable the service without deleting its configuration.</p>
+    </div>
+</div>
+
 <!-- EXTRAS -->
 <div class="form-group">
     <label class="col-sm-4 control-label">Description <br><em><small class="help-block">optional</small></em></label>
@@ -136,11 +149,41 @@
     </div>
 </div>
 
-<div class="form-group" ng-class="{'has-error' : errors.client_certificate}">
+<div class="form-group" ng-if="service.protocol === 'https' || service.protocol === 'tls'"
+     ng-class="{'has-error' : errors.client_certificate}">
     <label class="col-sm-4 control-label">Client certificate <br><em><small class="help-block">optional</small></em></label>
     <div class="col-sm-7">
         <input type="text" ng-model="service.client_certificate.id" class="form-control">
         <div class="text-danger" ng-if="errors.client_certificate" data-ng-bind="errors.client_certificate"></div>
         <p class="help-block">Certificate (<code>id</code>) to be used as client certificate while TLS handshaking to the upstream server.</p>
+    </div>
+</div>
+
+<div class="form-group" ng-if="isGatewayVersionEqOrGreater('2.0.0') && (service.protocol === 'https' || service.protocol === 'tls')"
+     ng-class="{'has-error' : errors.tls_verify}">
+    <label class="col-sm-4 control-label">TLS Verify</label>
+    <div class="col-sm-7">
+        <select class="form-control" ng-model="service.tls_verify"
+                ng-options="option.value as option.label for option in tlsVerifyOptions"></select>
+        <p class="help-block">Controls verification of the upstream server certificate.</p>
+    </div>
+</div>
+
+<div class="form-group" ng-if="isGatewayVersionEqOrGreater('2.0.0') && (service.protocol === 'https' || service.protocol === 'tls')"
+     ng-class="{'has-error' : errors.tls_verify_depth}">
+    <label class="col-sm-4 control-label">TLS Verify Depth</label>
+    <div class="col-sm-7">
+        <input type="number" min="0" ng-model="service.tls_verify_depth" class="form-control">
+        <p class="help-block">Maximum certificate chain depth used during upstream verification.</p>
+    </div>
+</div>
+
+<div class="form-group" ng-if="isGatewayVersionEqOrGreater('2.0.0') && (service.protocol === 'https' || service.protocol === 'tls')"
+     ng-class="{'has-error' : errors.ca_certificates}">
+    <label class="col-sm-4 control-label">CA Certificates</label>
+    <div class="col-sm-7">
+        <input type="text" ng-list="," ng-model="service.ca_certificates" class="form-control"
+               placeholder="Comma-separated CA Certificate IDs">
+        <p class="help-block">CA Certificate IDs used to build the upstream TLS trust store.</p>
     </div>
 </div>

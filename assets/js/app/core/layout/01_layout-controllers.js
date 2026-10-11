@@ -323,6 +323,15 @@
             access: AccessLevels.anon
           },
           {
+            state: 'key-sets',
+            icon: 'mdi-key-chain',
+            show: function () {
+              return AuthService.isAuthenticated() && UserService.user().node && $rootScope.isGatewayVersionEqOrGreater('3.0.0');
+            },
+            title: 'Keys & Vaults',
+            access: AccessLevels.user
+          },
+          {
             title: 'Application',
             show: function () {
               return AuthService.hasPermission('users', 'read') || AuthService.hasPermission('connections', 'read');

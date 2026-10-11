@@ -12,6 +12,12 @@
  */
 
 var fs = require('fs');
+var port = process.env.PORT || 1337;
+var allowedOrigins = (process.env.KONGA_ALLOWED_ORIGINS ||
+  'http://localhost:' + port + ',http://127.0.0.1:' + port)
+  .split(',')
+  .map(function(origin) { return origin.trim(); })
+  .filter(Boolean);
 
 module.exports = {
   /***************************************************************************
@@ -31,9 +37,22 @@ module.exports = {
    * Set the port in the production environment to 80                        *
    ***************************************************************************/
 
-  port: process.env.PORT || 1337,
+  port: port,
 
   explicitHost: process.env.HOST || "0.0.0.0",
+
+  sockets: {
+    beforeConnect: function(handshake, callback) {
+      var origin = handshake.headers && handshake.headers.origin;
+      // Same-origin polling and non-browser clients may omit Origin. Browsers
+      // include it for cross-origin requests, which must match the allowlist.
+      return callback(null, !origin || allowedOrigins.indexOf(origin) !== -1);
+    }
+  },
+
+  models: {
+    migrate: 'safe'
+  },
 
   ssl: {
     key: process.env.SSL_KEY_PATH ? fs.readFileSync(process.env.SSL_KEY_PATH) : null,

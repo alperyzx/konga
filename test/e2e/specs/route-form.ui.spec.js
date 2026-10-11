@@ -10,7 +10,7 @@
  */
 
 const { test, expect } = require('@playwright/test');
-const { kong, PREFIX } = require('../helpers/kong');
+const { kong, cleanupFixtures, PREFIX } = require('../helpers/kong');
 const { collectErrors, errors, waitForAngular } = require('../helpers/konga');
 
 const SERVICE = PREFIX + 'route-form-svc';
@@ -31,6 +31,7 @@ async function openRouteForm(page, serviceId) {
   // their own.
   await page.goto(`/#!/services/${serviceId}/read`);
   await waitForAngular(page);
+  await page.locator('.nav-pills a').filter({ hasText: /^\s*Routes\s*$/ }).click();
   await page.locator('button:has-text("add route")').first().click();
   await expect(page.locator('.modal form, .modal .form-group').first()).toBeVisible({
     timeout: 15000,
@@ -41,6 +42,7 @@ async function openRouteForm(page, serviceId) {
 let serviceId;
 
 test.beforeAll(async () => {
+  await cleanupFixtures();
   const { body } = await kong.post('/services', {
     name: SERVICE,
     url: 'http://httpbin.test:80',
@@ -49,7 +51,7 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-  if (serviceId) await kong.del(`/services/${serviceId}`);
+  await cleanupFixtures();
 });
 
 test.beforeEach(async ({ page }) => {

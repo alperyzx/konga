@@ -3,8 +3,8 @@
 var datastoreDefinitions = {
   localDiskDb: {
     adapter: 'sails-disk',
-    filePath: process.env.NODE_ENV === 'test' ? './.tmp/' : (process.env.STORAGE_PATH || './kongadata/'),
-    fileName: process.env.NODE_ENV === 'test' ? 'localDiskDb.db' : 'konga.db'
+    inMemoryOnly: process.env.NODE_ENV === 'test',
+    dir: process.env.STORAGE_PATH || './kongadata/'
   },
 
   mysql: {

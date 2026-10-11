@@ -6,10 +6,13 @@
      */
     angular.module('frontend.certificates')
         .service('SnisModel', [
-            'DataModel',
-            function(DataModel) {
+            'DataModel', '$http',
+            function(DataModel, $http) {
 
                 var model = new DataModel('kong/snis',true);
+                model.patch = function(identifier, data) {
+                    return $http.patch('kong/snis/' + identifier, data);
+                };
 
 
                 model.handleError = function($scope,err) {

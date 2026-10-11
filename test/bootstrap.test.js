@@ -3,7 +3,6 @@
  */
 
 var Sails = require('sails');
-var fs = require('fs');
 
 process.env.NODE_ENV = 'test';
 
@@ -11,31 +10,29 @@ process.env.NODE_ENV = 'test';
  * Mocha bootstrap before function, that is run before any tests are being processed. This will lift sails.js with
  * test configuration.
  *
- * Note! Tests will use localDiskDb connection and this _removes_ possible existing disk store file from .tmp folder!
+ * Tests use an in-memory sails-disk datastore and never touch local development data.
  *
  * @param   {Function}  next    Callback function
  */
 before(function before(next) {
-    fs.rm('.tmp/localDiskDb', {recursive: true, force: true}, function removeTestDatastore(error) {
-        Sails.lift({
-            // configuration for testing purposes
-            models: {
-                datastore: 'localDiskDb',
-                migrate: 'drop'
-            },
-            port: 1336,
-            environment: 'test',
-            log: {
-                level: 'error'
-            },
-            hooks: {
-                grunt: false,
-                helpers: false
-            }
-        }, function callback(error, sails) {
-            // Yeah sails is lifted now!
-            next(error, sails);
-        });
+    Sails.lift({
+        // configuration for testing purposes
+        models: {
+            datastore: 'localDiskDb',
+            migrate: 'drop'
+        },
+        port: 1336,
+        environment: 'test',
+        log: {
+            level: 'error'
+        },
+        hooks: {
+            grunt: false,
+            helpers: false
+        }
+    }, function callback(error, sails) {
+        // Yeah sails is lifted now!
+        next(error, sails);
     });
 });
 

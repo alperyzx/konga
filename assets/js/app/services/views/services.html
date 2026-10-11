@@ -21,6 +21,7 @@
         <div class="table-responsive" >
             <table class="table table-hover table-striped">
                 <tr>
+                    <th width="1" ng-if="user.hasPermission($state.name.split('.')[0],'edit')"></th>
                     <th width="1"></th>
                     <th width="{{item.width}}" class="text-nowrap"
                         data-ng-repeat="item in titleItems | filter:titleFilter"
@@ -45,6 +46,18 @@
                 </tr>
                 <tr
                         dir-paginate="service in items.data | orderBy:sort.column:sort.direction | filter : filters.searchWord | itemsPerPage: itemsPerPage as filteredItems">
+                    <td ng-if="user.hasPermission($state.name.split('.')[0],'edit')">
+                        <button type="button"
+                                class="btn btn-link btn-sm no-margin"
+                                data-service-enabled-toggle
+                                ng-if="service.enabled !== undefined"
+                                ng-click="toggleServiceEnabled(service)"
+                                aria-label="{{service.enabled ? 'Disable service' : 'Enable service'}}"
+                                uib-tooltip="{{service.enabled ? 'Disable Service' : 'Enable Service'}}">
+                            <i class="mdi"
+                               ng-class="service.enabled ? 'mdi-play-circle-outline text-primary' : 'mdi-stop-circle-outline text-muted'"></i>
+                        </button>
+                    </td>
                     <td>
                         <raw-view data-item="service"></raw-view>
                     </td>
@@ -85,4 +98,3 @@
         <dir-pagination-controls class="pull-right"></dir-pagination-controls>
     </div>
 </div>
-

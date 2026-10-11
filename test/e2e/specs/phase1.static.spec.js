@@ -99,6 +99,16 @@ test.describe('Phase 1: Kong 3.x dead code', () => {
 });
 
 test.describe('App integrity', () => {
+  test('route quick actions persist partial updates with PATCH', () => {
+    const controller = read(path.join(APP_JS, 'routes', 'controllers', 'routes-controller.js'));
+    const template = read(path.join(APP_JS, 'routes', 'views', 'routes.html'));
+
+    expect(controller).toMatch(/RoutesService\.update\(id, data\)/);
+    expect(controller).not.toMatch(/RouteModel\.update\(/);
+    expect(template).toContain("toggleRouteOption(route, 'strip_path')");
+    expect(template).toContain("toggleRouteOption(route, 'preserve_host')");
+  });
+
   test('every DI annotation matches its function arity', () => {
     // AngularJS gives no error for a short annotation array — it just injects
     // the wrong service into every later parameter, silently. Phase 1 stripped

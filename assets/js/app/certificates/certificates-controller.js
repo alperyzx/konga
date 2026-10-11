@@ -123,8 +123,15 @@
                   return false;
                 }
 
+                if (!!data.cert_alt !== !!data.key_alt) {
+                  $scope.errorMessage = 'Alternate Certificate and Alternate Key must be provided together'
+                  return false;
+                }
+
                 data.cert = data.cert.trim();
                 data.key = data.key.trim();
+                if (data.cert_alt) data.cert_alt = data.cert_alt.trim();
+                if (data.key_alt) data.key_alt = data.key_alt.trim();
 
                 if ($rootScope.isGatewayVersionEqOrGreater('0.14') && data.snis) {
                   data.snis = data.snis.split(",")
@@ -154,9 +161,16 @@
                   $scope.errorMessage = "The `Certificate` and/or `Key` fields cannot be empty"
                   return false;
                 }
+
+                if (!!data.cert_alt !== !!data.key_alt) {
+                  $scope.errorMessage = 'Alternate Certificate and Alternate Key must be provided together'
+                  return false;
+                }
                 
                 data.cert = data.cert.trim();
                 data.key = data.key.trim();
+                if (data.cert_alt) data.cert_alt = data.cert_alt.trim();
+                if (data.key_alt) data.key_alt = data.key_alt.trim();
 
                 CertificateModel.update(data.id, _.omit(data,['id']))
                   .then(function (resp) {

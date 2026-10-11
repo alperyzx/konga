@@ -97,6 +97,7 @@ var AuthController = {
 
     sails.models.user
       .create(_.omit(data, ['password', 'password_confirmation']))
+      .fetch()
       .exec(function (err, user) {
         if (err) {
           console.log(err.invalidAttributes)
@@ -149,6 +150,7 @@ var AuthController = {
 
         sails.models.user
           .create(data)
+          .fetch()
           .exec(function (err, user) {
             if (err) return res.negotiate(err)
 

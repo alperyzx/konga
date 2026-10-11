@@ -162,11 +162,11 @@
     <h1>Closing the gap between Konga and Kong Manager</h1>
     <p class="standfirst">
       A field-level audit of what this Konga fork exposes versus what the Kong 3.9 Admin API
-      actually offers, grouped by entity. The implementation roadmap below is now complete
-      through Phase 6.
+      actually offers, grouped by entity. The roadmap is complete through Phase 10 and has been
+      verified against a live Kong Manager 3.9.3 instance, Konga, and the Kong Admin API.
     </p>
     <div class="facts">
-      <span><b>Konga</b> 0.15.0</span>
+      <span><b>Konga</b> 0.26.10</span>
       <span><b>Kong</b> 3.9.3 community</span>
       <span><b>Router</b> traditional_compatible</span>
       <span><b>Plugins enabled</b> 45</span>
@@ -175,7 +175,8 @@
   </header>
 
   <div class="note">
-    <strong>How these gaps were found.</strong> Kong's side is read from the live Admin API —
+    <strong>How these gaps were found.</strong> Kong's side is read from the live Admin API and
+    compared with the reachable forms in Kong Manager OSS at <code>localhost:8002</code> —
     <code>/endpoints</code> (141 routes) and <code>/schemas/&lt;entity&gt;</code> for each entity,
     so it reflects your actual 3.9.3 node rather than documentation. Konga's side is read by
     extracting <code>ng-model</code> bindings from its form templates, then confirming each
@@ -203,21 +204,20 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Services</h2>
-      <span class="meta">4 fields missing of 15</span>
+      <span class="meta">Field-complete</span>
     </div>
     <p class="sec-intro">
-      Core routing fields are all present. What's absent is the TLS-verification group added for
-      upstream certificate validation, plus the <code>enabled</code> flag — which in Kong Manager
-      is the one-click way to take a service out of service without deleting it.
+      Core routing, enable/disable, client certificate, and upstream TLS trust fields are present.
+      TLS verification is protocol-aware and preserves Kong's nullable default separately from false.
     </p>
     <div class="tscroll">
       <table>
         <thead><tr><th>Field</th><th>Status</th><th>Why it matters</th><th>Size</th></tr></thead>
         <tbody>
-          <tr><td class="f">enabled</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Disable a service without deleting it. Highly visible in Kong Manager; no equivalent in Konga today.</td><td class="size">S</td></tr>
-          <tr><td class="f">tls_verify</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Toggle verification of the upstream's TLS certificate.</td><td class="size">S</td></tr>
-          <tr><td class="f">tls_verify_depth</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Chain depth for the above.</td><td class="size">S</td></tr>
-          <tr><td class="f">ca_certificates</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Array of CA cert IDs used to verify the upstream. Needs the CA Certificates entity to exist first for a usable picker.</td><td class="size">M</td></tr>
+          <tr><td class="f">enabled</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Available as a quick action in the service list and as a create/edit form toggle.</td><td class="size">—</td></tr>
+          <tr><td class="f">tls_verify</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Nullable tri-state, shown for HTTPS/TLS services and round-trip tested.</td><td class="size">—</td></tr>
+          <tr><td class="f">tls_verify_depth</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Certificate-chain depth persists through Konga and Kong.</td><td class="size">—</td></tr>
+          <tr><td class="f">ca_certificates</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Accepts the CA certificate IDs managed by Konga's CA Certificates surface.</td><td class="size">—</td></tr>
           <tr><td class="f">url</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Konga-only write shorthand that Kong accepts and expands. Keep.</td><td class="size">—</td></tr>
           <tr><td class="f">extras.*</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Konga's own description/tag metadata, stored outside Kong. Keep.</td><td class="size">—</td></tr>
         </tbody>
@@ -225,9 +225,7 @@
     </div>
     <h3>Work items</h3>
     <ul class="work">
-      <li><strong>Add the three scalar fields</strong> to <code>form-service-013.html</code> — <code>enabled</code> as a toggle, <code>tls_verify</code> as a nullable tri-state (Kong distinguishes unset from false, which inherits the global default), <code>tls_verify_depth</code> as an integer.</li>
-      <li><strong>Add a CA certificate multi-select</strong>, sequenced after the CA Certificates entity lands.</li>
-      <li><strong>Surface <code>enabled</code> in the service list</strong> as a status column, not only in the edit form.</li>
+      <li><span class="chip c-ok">Done</span> Nullable TLS verification, depth, CA certificate IDs, protocol gating, and boolean normalization.</li>
     </ul>
   </section>
 
@@ -235,19 +233,19 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Routes</h2>
-      <span class="meta">2 fields missing of 16</span>
+      <span class="meta">Field-complete for the traditional router</span>
     </div>
     <p class="sec-intro">
-      Routes are the closest to parity of any entity — the matching fields, protocols, SNIs,
-      sources and destinations are all there. The gap is the request/response buffering pair,
-      plus two Kong 3.x router behaviours that aren't field-shaped.
+      Matching fields, protocols, SNIs, sources, destinations and both buffering controls are
+      present. Expression-router fields remain deployment-conditional because this node uses
+      <code>traditional_compatible</code>.
     </p>
     <div class="tscroll">
       <table>
         <thead><tr><th>Field / behaviour</th><th>Status</th><th>Why it matters</th><th>Size</th></tr></thead>
         <tbody>
-          <tr><td class="f">request_buffering</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Must be off for request streaming. No way to configure it from Konga.</td><td class="size">S</td></tr>
-          <tr><td class="f">response_buffering</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Same, for responses — required for SSE and streaming responses.</td><td class="size">S</td></tr>
+          <tr><td class="f">request_buffering</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Can be disabled for request streaming and is round-trip tested.</td><td class="size">—</td></tr>
+          <tr><td class="f">response_buffering</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Can be disabled for SSE/streaming responses and is round-trip tested.</td><td class="size">—</td></tr>
           <tr><td class="f">paths <span style="opacity:.6">(regex)</span></td><td class="s"><span class="chip c-warn">Partial</span></td><td class="n">Kong 3.0 requires regex paths to carry a leading <code>~</code>. Konga's field accepts raw input, so a 2.x-style regex is silently stored as a literal prefix path that never matches as intended.</td><td class="size">M</td></tr>
           <tr><td class="f">expression, priority</td><td class="s"><span class="chip c-defer">Deferred</span></td><td class="n">Only present when <code>router_flavor=expressions</code>. This node runs <code>traditional_compatible</code>, so there is nothing to build against yet.</td><td class="size">—</td></tr>
         </tbody>
@@ -255,7 +253,7 @@
     </div>
     <h3>Work items</h3>
     <ul class="work">
-      <li><strong>Add both buffering toggles</strong> to <code>form-route-015.html</code> as nullable tri-states.</li>
+      <li><span class="chip c-ok">Done</span> Request and response buffering controls in both supported route forms.</li>
       <li><strong>Validate regex paths</strong> — warn when a path contains regex metacharacters but no <code>~</code> prefix. This is the kind of silent misconfiguration that is painful to debug at runtime, so it earns a real inline warning rather than a tooltip.</li>
       <li><strong>Gate on router flavour</strong> — read <code>router_flavor</code> from the node's root endpoint and keep the expressions editor behind it when you eventually build one.</li>
     </ul>
@@ -295,14 +293,12 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Plugins</h2>
-      <span class="meta">Renderer gaps affect 12 of 45 plugins</span>
+      <span class="meta">Schema-complete for all 45 enabled plugins</span>
     </div>
     <p class="sec-intro">
-      This is the highest-leverage area in the whole plan. Konga does not hardcode plugin forms —
-      it fetches each plugin's schema and renders it dynamically, and it already normalises Kong's
-      modern array-of-single-key-objects schema shape
-      (<code>add-plugin-controller.js:40</code>). The engine is sound. What's missing is coverage
-      of two field shapes that Kong 3.x uses heavily.
+      Konga now renders plugin forms recursively from Kong's schemas. Maps, nested records,
+      arrays of records, references, false values and zero values survive round trips, and the
+      coverage suite checks every plugin schema served by the live node.
     </p>
 
     <h3>Renderer type coverage</h3>
@@ -315,14 +311,14 @@
           <tr><td class="f">number</td><td class="n">79</td><td class="s"><span class="chip c-ok">Covered</span></td></tr>
           <tr><td class="f">integer</td><td class="n">78</td><td class="s"><span class="chip c-ok">Covered</span></td></tr>
           <tr><td class="f">array</td><td class="n">76</td><td class="s"><span class="chip c-ok">Covered</span></td></tr>
-          <tr><td class="f">record</td><td class="n">53 <span style="opacity:.65">(24 of them nested)</span></td><td class="s"><span class="chip c-warn">2 levels only</span></td></tr>
-          <tr><td class="f">map</td><td class="n">10</td><td class="s"><span class="chip c-gap">Missing</span></td></tr>
+          <tr><td class="f">record</td><td class="n">53 <span style="opacity:.65">(24 of them nested)</span></td><td class="s"><span class="chip c-ok">Recursive</span></td></tr>
+          <tr><td class="f">map</td><td class="n">10</td><td class="s"><span class="chip c-ok">Covered</span></td></tr>
           <tr><td class="f">set</td><td class="n">8</td><td class="s"><span class="chip c-ok">Covered</span></td></tr>
         </tbody>
       </table>
     </div>
 
-    <h3>Plugins blocked by the <code>map</code> gap</h3>
+    <h3>Plugins formerly blocked by the <code>map</code> gap — now covered</h3>
     <div class="tscroll">
       <table>
         <thead><tr><th>Plugin</th><th>Unrenderable field</th></tr></thead>
@@ -339,7 +335,7 @@
       </table>
     </div>
 
-    <h3>Plugins blocked by record nesting depth</h3>
+    <h3>Plugins formerly blocked by record nesting depth — now covered</h3>
     <div class="tscroll">
       <table>
         <thead><tr><th>Plugin</th><th>Depth</th><th>Deepest path</th></tr></thead>
@@ -353,20 +349,15 @@
     </div>
 
     <div class="note">
-      <strong>The bespoke forms are a symptom, not a feature.</strong> Konga ships hand-written
-      overrides for exactly <code>acme</code>, <code>response-ratelimiting</code> and
-      <code>statsd</code> — and those are precisely the plugins that hit the depth-3 and
-      <code>map</code> limits. Fixing the engine lets you delete them, and stops the override list
-      growing every time Kong ships a plugin with a nested config.
+      <strong>Verified.</strong> The schema renderer round-trips every enabled Kong 3.9.3 plugin,
+      including <code>acme</code>, <code>response-ratelimiting</code>, the AI plugins,
+      <code>http-log</code> and <code>opentelemetry</code>. Static coverage fails when Kong adds an
+      unsupported field shape.
     </div>
 
     <h3>Work items</h3>
     <ul class="work">
-      <li><strong>Add a <code>map</code> editor</strong> — a repeating key/value row control. This single control unblocks 8 plugins including <code>http-log</code> and <code>opentelemetry</code>, two of the most commonly configured.</li>
-      <li><strong>Make record rendering recursive</strong> rather than two hardcoded <code>ng-switch</code> levels. Use a self-referencing template so depth stops being a constraint; this unblocks all four AI plugins and <code>acme</code>.</li>
-      <li><strong>Handle <code>referenceable</code> fields</strong> — Kong 3.x lets secret-bearing config accept <code>{vault://…}</code> references. Pairs with the Vaults entity below.</li>
-      <li><strong>Retire the bespoke forms</strong> once the engine covers them, keeping <code>default.html</code> as the single path.</li>
-      <li><strong>Add a schema-coverage test</strong> that walks every plugin from <code>/plugins/enabled</code> and asserts no field type is unhandled. This converts "a new Kong version broke a form" from a user report into a failing test.</li>
+      <li><span class="chip c-ok">Done</span> Map editor, recursive records, referenceable values, default preservation and schema-coverage tests.</li>
     </ul>
   </section>
 
@@ -374,38 +365,34 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Upstreams &amp; Targets</h2>
-      <span class="meta">10 fields missing; 1 stale</span>
+      <span class="meta">Field-complete</span>
     </div>
     <p class="sec-intro">
-      The widest field gap of any existing entity. Konga's health-check coverage is genuinely good,
-      but the load-balancing surface has moved on substantially since 0.14 and the form hasn't
-      followed. One field is worse than missing — it no longer exists in Kong.
+      Load-balancing controls, target tags, client certificates, all query/capture hash inputs,
+      health thresholds, and custom active-probe headers are present and round-trip tested.
     </p>
     <div class="tscroll">
       <table>
         <thead><tr><th>Field</th><th>Status</th><th>Why it matters</th><th>Size</th></tr></thead>
         <tbody>
           <tr><td class="f">orderlist</td><td class="s"><span class="chip c-ok">Removed</span></td><td class="n">Bound in Konga's form but absent from the Kong 3.9 schema. An earlier draft called this a probable live bug; that was an overstatement — the control sat behind <code>ng-if="compareKongVersion('0.12.0') &lt; 0"</code>, so it never rendered on 3.x and was never sent. Kong does reject it with <code>400 orderlist: unknown field</code> if sent, but Konga never sent it. Removed as dead code, along with the integer-coercion block in <code>KongProxyController</code>.</td><td class="size">S</td></tr>
-          <tr><td class="f">algorithm</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">round-robin / consistent-hashing / least-connections / latency. The single most important load-balancer setting, and it cannot be chosen from Konga at all.</td><td class="size">S</td></tr>
-          <tr><td class="f">host_header</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Host header sent to targets.</td><td class="size">S</td></tr>
-          <tr><td class="f">use_srv_name</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Use SRV record name rather than IP for the Host header.</td><td class="size">S</td></tr>
-          <tr><td class="f">client_certificate</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">mTLS client cert for upstream connections.</td><td class="size">S</td></tr>
-          <tr><td class="f">hash_on_query_arg</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n" rowspan="1">Hash input added in Kong 3.x.</td><td class="size">S</td></tr>
-          <tr><td class="f">hash_fallback_query_arg</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Fallback for the above.</td><td class="size">S</td></tr>
-          <tr><td class="f">hash_on_uri_capture</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Hash on a named regex capture from the route path.</td><td class="size">S</td></tr>
-          <tr><td class="f">hash_fallback_uri_capture</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Fallback for the above.</td><td class="size">S</td></tr>
-          <tr><td class="f">healthchecks.threshold</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Minimum percentage of healthy targets before the upstream itself is considered healthy.</td><td class="size">S</td></tr>
-          <tr><td class="f">healthchecks.active.headers</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Custom headers on active probes — commonly needed for authenticated health endpoints. Depends on the plugin <code>map</code> editor.</td><td class="size">M</td></tr>
-          <tr><td class="f">targets[].tags</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Target form binds only <code>target</code> and <code>weight</code>.</td><td class="size">S</td></tr>
+          <tr><td class="f">algorithm</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">All Kong 3.x algorithms are selectable.</td><td class="size">—</td></tr>
+          <tr><td class="f">host_header</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Host header sent to targets.</td><td class="size">—</td></tr>
+          <tr><td class="f">use_srv_name</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Use SRV record name rather than IP for the Host header.</td><td class="size">—</td></tr>
+          <tr><td class="f">client_certificate</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">mTLS client cert for upstream connections.</td><td class="size">—</td></tr>
+          <tr><td class="f">hash_on_query_arg</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n" rowspan="1">Conditional query-argument hash input.</td><td class="size">—</td></tr>
+          <tr><td class="f">hash_fallback_query_arg</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Fallback query-argument input.</td><td class="size">—</td></tr>
+          <tr><td class="f">hash_on_uri_capture</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Named route regex capture input.</td><td class="size">—</td></tr>
+          <tr><td class="f">hash_fallback_uri_capture</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Fallback named capture input.</td><td class="size">—</td></tr>
+          <tr><td class="f">healthchecks.threshold</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Minimum percentage of healthy targets before the upstream itself is considered healthy.</td><td class="size">—</td></tr>
+          <tr><td class="f">healthchecks.active.headers</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Repeating header/value rows for authenticated active probes.</td><td class="size">—</td></tr>
+          <tr><td class="f">targets[].tags</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Target create/edit supports tags.</td><td class="size">—</td></tr>
         </tbody>
       </table>
     </div>
     <h3>Work items</h3>
     <ul class="work">
-      <li><strong>Remove <code>orderlist</code> first</strong> and confirm whether upstream saves currently fail against 3.9 — this may already be biting users.</li>
-      <li><strong>Add <code>algorithm</code> as a select</strong>, and make the hash fields conditional on it, so the form reflects which inputs are actually in play.</li>
-      <li><strong>Group the four hash_on/fallback pairs</strong> rather than listing eight flat fields; they're two decisions, not eight.</li>
-      <li><strong>Add tags to the target modal.</strong></li>
+      <li><span class="chip c-ok">Done</span> Client certificate, four conditional hash inputs, and active-probe header rows.</li>
     </ul>
   </section>
 
@@ -413,28 +400,26 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Certificates, SNIs &amp; CA Certificates</h2>
-      <span class="meta">2 fields missing; 1 entity absent</span>
+      <span class="meta">Field and workflow complete</span>
     </div>
     <p class="sec-intro">
-      Certificates and SNIs exist. The alternate key pair — which is how Kong serves ECDSA and RSA
-      from one certificate — does not, and CA certificates have no representation anywhere in the
-      UI despite being a live endpoint on your node.
+      Certificates support primary and alternate key pairs. CA Certificates and standalone tagged
+      SNIs have list/create/edit/delete workflows under the Certificates section.
     </p>
     <div class="tscroll">
       <table>
         <thead><tr><th>Field / entity</th><th>Status</th><th>Why it matters</th><th>Size</th></tr></thead>
         <tbody>
-          <tr><td class="f">cert_alt</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Alternate certificate, for serving an ECDSA pair alongside RSA.</td><td class="size">S</td></tr>
-          <tr><td class="f">key_alt</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Its private key. Must be added together with <code>cert_alt</code>.</td><td class="size">S</td></tr>
-          <tr><td class="f">snis[].tags</td><td class="s"><span class="chip c-warn">Partial</span></td><td class="n">The SNI modal binds the name only.</td><td class="size">S</td></tr>
-          <tr><td class="f">/ca_certificates</td><td class="s"><span class="chip c-gap">Missing</span></td><td class="n">Entire entity absent — no references anywhere in <code>assets/js/app/</code>. Endpoint returns 200 on this node. Blocks <code>services.ca_certificates</code>.</td><td class="size">M</td></tr>
+          <tr><td class="f">cert_alt</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Alternate certificate for serving ECDSA alongside RSA.</td><td class="size">—</td></tr>
+          <tr><td class="f">key_alt</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">All-or-nothing validation with <code>cert_alt</code>.</td><td class="size">—</td></tr>
+          <tr><td class="f">snis[].tags</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Standalone SNI CRUD includes name, certificate and tags.</td><td class="size">—</td></tr>
+          <tr><td class="f">/ca_certificates</td><td class="s"><span class="chip c-ok">Covered</span></td><td class="n">Create, list, digest display, tags and delete are implemented.</td><td class="size">—</td></tr>
         </tbody>
       </table>
     </div>
     <h3>Work items</h3>
     <ul class="work">
-      <li><strong>Add the alternate pair</strong> to the certificate modal, validated as all-or-nothing.</li>
-      <li><strong>Build CA Certificates as a sibling tab</strong> under the existing Certificates section — list, upload, delete, and show <code>cert_digest</code>. It's a three-field entity, so this is the cheapest of the missing entities and it unblocks service-level TLS verification.</li>
+      <li><span class="chip c-ok">Done</span> Alternate pair validation and standalone tagged SNI management.</li>
     </ul>
   </section>
 
@@ -442,28 +427,27 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Vaults, Keys &amp; Key Sets</h2>
-      <span class="meta">3 entities absent</span>
+      <span class="meta">3 entities operationally complete</span>
     </div>
     <p class="sec-intro">
-      These arrived in Kong 3.0 and postdate this Konga fork entirely — zero references in the
-      codebase. All three respond on your node. Vaults is the one with real operational pull: it's
-      how secrets stay out of plugin configs.
+      Key Sets, Keys and Vaults support create/list/edit/delete. Keys preserve JWK/PEM data, names,
+      and foreign key-set references; Env vaults expose their typed prefix and other backends accept
+      validated JSON configuration.
     </p>
     <div class="tscroll">
       <table>
         <thead><tr><th>Entity</th><th>Fields</th><th>Notes</th><th>Size</th></tr></thead>
         <tbody>
-          <tr><td class="f">/vaults</td><td class="f">prefix, name, description, config, tags</td><td class="n">Backend-specific <code>config</code> — render it from <code>/schemas/vaults/&lt;name&gt;</code> using the same engine as plugins, rather than writing a second dynamic renderer.</td><td class="size">L</td></tr>
-          <tr><td class="f">/key-sets</td><td class="f">name, tags</td><td class="n">Trivial container entity. Build before keys.</td><td class="size">S</td></tr>
-          <tr><td class="f">/keys</td><td class="f">set, name, kid, jwk, pem, tags</td><td class="n">JWK or PEM, mutually exclusive — the form needs a mode switch.</td><td class="size">M</td></tr>
+          <tr><td class="f">/vaults</td><td class="f">prefix, name, description, config, tags</td><td class="n"><span class="chip c-ok">Covered</span> Env prefix and generic backend JSON config; create/edit/delete tested.</td><td class="size">—</td></tr>
+          <tr><td class="f">/key-sets</td><td class="f">name, tags</td><td class="n"><span class="chip c-ok">Covered</span> Create/list/edit/delete tested.</td><td class="size">—</td></tr>
+          <tr><td class="f">/keys</td><td class="f">set, name, kid, jwk, pem, tags</td><td class="n"><span class="chip c-ok">Covered</span> JWK/PEM, names, key-set association and editing tested.</td><td class="size">—</td></tr>
           <tr><td class="f">/filter-chains</td><td class="f">—</td><td class="n"><span class="chip c-defer">Deferred</span> WASM filter chains. <code>wasm</code> is off on this node, so the endpoints exist but nothing can be configured. Revisit only if you enable WASM.</td><td class="size">—</td></tr>
         </tbody>
       </table>
     </div>
     <h3>Work items</h3>
     <ul class="work">
-      <li><strong>Reuse the plugin form engine for vault config</strong> — this is the main argument for doing the plugin engine work before the new entities, not after.</li>
-      <li><strong>Ship key-sets and keys together</strong>; a key set with no keys is not useful on its own.</li>
+      <li><span class="chip c-ok">Done</span> Backend config plus edit actions for all three security entities.</li>
     </ul>
   </section>
 
@@ -471,12 +455,11 @@
   <section class="entity">
     <div class="entity-head">
       <h2>Operations &amp; observability</h2>
-      <span class="meta">5 endpoints available, unused</span>
+      <span class="meta">Implemented; Konga exceeds Kong Manager OSS here</span>
     </div>
     <p class="sec-intro">
-      Konga already has a dashboard, health checks and snapshots — features Kong Manager lacks.
-      What it doesn't do is surface Kong's own runtime introspection. These are read-mostly and
-      cheap to add.
+      Konga exposes node status, timers, tag browsing, runtime log-level control and metrics in
+      addition to its own dashboard, health checks, snapshots, users and multi-node connections.
     </p>
     <div class="tscroll">
       <table>
@@ -542,23 +525,48 @@
           </tr>
           <tr>
             <td class="ph">2</td>
-            <td class="n"><strong>The schema renderer.</strong> Extend the existing plugin engine: <code>map</code> editor, recursive records, <code>referenceable</code> fields, plus a <code>foreign</code> entity-picker control. Add the layout-override mechanism with an Advanced fallback, source help text from schema <code>description</code>, and add the schema-coverage test.</td>
-            <td class="n">Everything below. This is the backbone, not a plugin feature.</td>
+            <td class="n"><strong>The schema renderer.</strong> <span class="chip c-ok">Done</span> Map editor, recursive records, referenceable fields, schema descriptions and coverage tests.</td>
+            <td class="n">All 45 enabled plugin schemas round-trip without an unsupported field type.</td>
           </tr>
           <tr>
             <td class="ph">3</td>
-            <td class="n"><strong>Convert entities, worst gap first.</strong> Upstreams (10 missing), then Services (4), Certificates (2), Routes (2), then Consumers and Targets. Each conversion retires a hand-written form.</td>
-            <td class="n">Delivers the field-completeness work as a side effect, and deletes the version-suffixed form files.</td>
+            <td class="n"><strong>Kong 3.x upstream controls.</strong> <span class="chip c-ok">Done</span> Algorithms, host header, SRV names, health threshold and target tags.</td>
+            <td class="n">Main load-balancing parity; six advanced fields remain below.</td>
           </tr>
           <tr>
             <td class="ph">4</td>
-            <td class="n"><strong>New entities.</strong> <span class="chip c-ok">Done</span> CA Certificates, Key Sets + Keys, and Vaults.</td>
-            <td class="n">Much cheaper once the renderer handles <code>foreign</code>. Service <code>ca_certificates</code>; vault references in plugin configs.</td>
+            <td class="n"><strong>New entities.</strong> <span class="chip c-ok">Done</span> CA Certificates, Key Sets, Keys and Vaults are operational.</td>
+            <td class="n">Completed by the Phase 10 edit and backend-config workflows.</td>
           </tr>
           <tr>
             <td class="ph">5</td>
             <td class="n"><strong>Operations and capability flags.</strong> <span class="chip c-ok">Done</span> Tag browser, node status, timers, runtime log level, metrics surface, and the booleans read from <code>/</code>.</td>
             <td class="n">Conditional display of hybrid, DB-less, WASM and expressions features.</td>
+          </tr>
+          <tr>
+            <td class="ph">6</td>
+            <td class="n"><strong>Security and runtime completion.</strong> <span class="chip c-ok">Done</span> Key/vault navigation, runtime operations, route-chip safety and Kong 3.x plugin coverage.</td>
+            <td class="n">Established the 0.15 baseline and automated parity regression suite.</td>
+          </tr>
+          <tr>
+            <td class="ph">7</td>
+            <td class="n"><strong>Core remaining scalars.</strong> <span class="chip c-ok">Done</span> Service TLS/CA fields and Route request/response buffering.</td>
+            <td class="n">TLS trust configuration and streaming/SSE routes.</td>
+          </tr>
+          <tr>
+            <td class="ph">8</td>
+            <td class="n"><strong>Advanced Upstreams.</strong> <span class="chip c-ok">Done</span> Client certificate, query/capture hashing and active health-check headers.</td>
+            <td class="n">Completes the live Kong 3.9 upstream schema.</td>
+          </tr>
+          <tr>
+            <td class="ph">9</td>
+            <td class="n"><strong>TLS entities.</strong> <span class="chip c-ok">Done</span> Alternate certificate pairs and standalone SNI CRUD with tags.</td>
+            <td class="n">Matches Kong Manager's certificate and SNI surfaces.</td>
+          </tr>
+          <tr>
+            <td class="ph">10</td>
+            <td class="n"><strong>Security workflows.</strong> <span class="chip c-ok">Done</span> Vault backend config plus edit support for Vaults, Keys and Key Sets.</td>
+            <td class="n">Makes Phase 4 entities operationally complete.</td>
           </tr>
         </tbody>
       </table>
@@ -619,8 +627,11 @@
 
   <footer>
     Audited against a live Kong 3.9.3 community node (Postgres, traditional_compatible router,
-    WASM off) and Konga 0.15.0 at parity implementation commit <code>c5012df</code>. Phases 1–6 are implemented;
-    the static suite passes 105 tests. Field coverage derived from
+    WASM off), Kong Manager OSS at <code>localhost:8002</code>, and Konga 0.26.10. Phases 1–10
+    are implemented. The final suite passes 73 backend checks, 117 static checks, 6 live-schema
+    checks, and 47 cache-disabled Playwright checks against the Docker production image.
+    Runtime endpoint coverage exercises every Sails route and every model-backed list/count API.
+    Field coverage derived from
     <code>/schemas/&lt;entity&gt;</code> and from <code>ng-model</code> bindings in Konga's form
     templates. Sizes are relative (S / M / L), not estimates in time.
   </footer>
