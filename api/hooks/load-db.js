@@ -59,10 +59,10 @@ module.exports = function hook(sails) {
                     })
             }
             async.series([
-                sails.models.user.seed,
+                sails.models.user.seed.bind(sails.models.user),
                 seedPassports,
-                sails.models.kongnode.seed,
-                sails.models.emailtransport.seed,
+                sails.models.kongnode.seed.bind(sails.models.kongnode),
+                sails.models.emailtransport.seed.bind(sails.models.emailtransport),
                 function seedOrMergeSettings(cb) {
                     var seeds = sails.models.settings.seedData[0]
                     sails.models.settings.find().limit(1)
@@ -105,20 +105,24 @@ module.exports = function hook(sails) {
                 } else {
                   sails.log.verbose(__filename + ':' + __line + ' [Hook.load-db] Populating database with fixture data...');
 
-                  var _ = require('lodash');
-                  var Barrels = require('barrels');
-                  var barrels = new Barrels();
-                  var fixtures = _.keys(barrels.data);
-
-                  barrels.populate(['user'], function(error) {
-                    if (error) {
-                      next(error);
+                  var populatedUsers;
+                  async.series([
+                    function populateUsers(callback) {
+                      sails.models.user.createEach(require('../../test/fixtures/User.json')).fetch().exec(function(error, users) {
+                        populatedUsers = users;
+                        callback(error);
+                      });
+                    },
+                    function populatePassports(callback) {
+                      async.eachOfSeries(require('../../test/fixtures/Passport.json'), function createPassport(passport, index, nextPassport) {
+                        passport = _.assign({}, passport, {user: populatedUsers[index].id});
+                        sails.models.passport.create(passport).exec(nextPassport);
+                      }, callback);
+                    },
+                    function populateNodes(callback) {
+                      sails.models.kongnode.createEach(require('../../test/fixtures/KongNode.json')).exec(callback);
                     }
-
-                    fixtures = _.without(fixtures, 'user');
-
-                    barrels.populate(fixtures, next, false);
-                  }, false);
+                  ], next);
                 }
               })
             ;

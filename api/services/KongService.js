@@ -3,7 +3,7 @@
 const unirest = require("unirest")
 const ApiHealthCheckService = require('../services/ApiHealthCheckService')
 const JWT = require("./Token");
-const Utils = require('../helpers/utils');
+const Utils = require('../lib/utils');
 const ProxyHooks = require('../services/KongProxyHooks');
 const _ = require('lodash');
 

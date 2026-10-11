@@ -23,14 +23,14 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         sails.models.kongnode.findOne({id:req.params.id}).exec(function afterwards(err, node){
 
             if (err) return res.negotiate(err);
-            sails.models.kongnode.update({id:req.params.id},req.body).exec(function afterwards(err, resp){
+            sails.models.kongnode.update({id:req.params.id},req.body).fetch().exec(function afterwards(err, resp){
 
                 if (err) return res.negotiate(err);
                 if(req.body.active && node.active != req.body.active) {
                     sails.models.kongnode.update({
                         where: { id:{ '!': req.params.id } },
 
-                    },{active:false}).exec(function afterwards(err, upd){
+                    },{active:false}).fetch().exec(function afterwards(err, upd){
                         if (err) return res.negotiate(err);
                         return  res.json(resp[0])
                     })
@@ -44,7 +44,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
 
     create : function(req,res) {
-        sails.models.kongnode.create(req.body)
+        sails.models.kongnode.create(req.body).fetch()
             .exec(function(err, node){
                 if(err) {
                     return res.negotiate(err);
@@ -63,7 +63,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                     if(info) {
                         sails.models.kongnode.update(node.id,{
                             kong_version : info.version
-                        }).exec(function (err, _node) {
+                        }).fetch().exec(function (err, _node) {
                             if(err) {
                                 return res.negotiate(err);
                             }

@@ -170,7 +170,7 @@ passport.endpoint = function endpoint(request, response) {
 
   // If a provider doesn't exist for this endpoint, send the user back to the login page
   if (!strategies.hasOwnProperty(provider)) {
-    response.json(401, 'Unknown auth provider');
+    response.status(401).json('Unknown auth provider');
   } else {
     // Attach scope if it has been set in the config
     if (strategies[provider].hasOwnProperty('scope')) {

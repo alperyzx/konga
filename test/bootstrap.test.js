@@ -16,11 +16,11 @@ process.env.NODE_ENV = 'test';
  * @param   {Function}  next    Callback function
  */
 before(function before(next) {
-    fs.unlink('.tmp/localDiskDb.db', function unlinkDone(error) {
+    fs.rm('.tmp/localDiskDb', {recursive: true, force: true}, function removeTestDatastore(error) {
         Sails.lift({
             // configuration for testing purposes
             models: {
-                connection: 'localDiskDb',
+                datastore: 'localDiskDb',
                 migrate: 'drop'
             },
             port: 1336,
@@ -29,7 +29,8 @@ before(function before(next) {
                 level: 'error'
             },
             hooks: {
-                grunt: false
+                grunt: false,
+                helpers: false
             }
         }, function callback(error, sails) {
             // Yeah sails is lifted now!

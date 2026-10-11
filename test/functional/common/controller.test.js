@@ -557,7 +557,7 @@ describe('Generic controller test', function controllerTest() {
                                         return done(error);
                                     }
 
-                                    expect(result.res.text).to.equal('No record found with the specified `id`.');
+                                    expect(result.res.text).to.equal('');
 
                                     done();
                                 }

@@ -33,11 +33,11 @@ module.exports = function kongError(data, options) {
 
   // Backend will always response JSON
   if(data.error && data.error.code && data.error.code === 'ECONNREFUSED') {
-    return res.json(500, {message: 'Connection refused. Unable to connect to a Kong Node.'});
+    return res.status(500).json({message: 'Connection refused. Unable to connect to a Kong Node.'});
   }
   if(data.error && data.error.code && data.error.code === 'ETIMEDOUT') {
-    return res.json(500, {message: 'Request timed out'});
+    return res.status(500).json({message: 'Request timed out'});
   }
 
-  return res.json(data.statusCode, {customMessage:data.body});
+  return res.status(data.statusCode).json({customMessage:data.body});
 };

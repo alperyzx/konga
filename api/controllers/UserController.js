@@ -10,6 +10,25 @@ var _ = require('lodash');
  */
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
+    create: function(req, res) {
+        var userData = _.omit(req.body, ['passports', 'password_confirmation']);
+        var passportData = req.body.passports;
+
+        sails.models.user.create(userData).fetch().exec(function(err, user) {
+            if(err) return res.negotiate(err);
+            if(!passportData || !passportData.password) return res.created(user);
+
+            sails.models.passport.create({
+                protocol: 'local',
+                password: passportData.password,
+                user: user.id
+            }).exec(function(passportError) {
+                if(passportError) return res.negotiate(passportError);
+                return res.created(user);
+            });
+        });
+    },
+
 
 
     subscribe: function(req, res) {
@@ -40,6 +59,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
         sails.models.user
             .update({id : req.param('id')},user)
+            .fetch()
             .exec(function(err,updated){
                 if(err) return res.negotiate(err);
 
@@ -66,6 +86,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
                 sails.models.passport
                     .update({user:req.param('id')},{password:passports.password})
+                    .fetch()
                     .exec(function(err,updatedPassport){
                         if(err) return res.negotiate(err);
                         return  res.json(user)

@@ -223,7 +223,7 @@ var AuthController = {
         return response.serverError(error);
       }
 
-      response.json(200, true);
+      response.status(200).json(true);
     });
   },
 
@@ -250,9 +250,9 @@ var AuthController = {
    */
   authenticated: function authenticated(request, response) {
     if (request.isAuthenticated()) {
-      response.json(200, request.user);
+      response.status(200).json(request.user);
     } else {
-      response.json(200, false);
+      response.status(200).json(false);
     }
   },
 
@@ -290,11 +290,11 @@ var AuthController = {
           sails.log.verbose('User authentication failed');
           sails.log.verbose(error);
 
-          response.json(401, error);
+          response.status(401).json(error);
         } else { // Upon successful login, send back user data and JWT token
 
 
-          response.json(200, {
+          response.status(200).json({
             user: user,
             token: sails.services.token.issue(_.isObject(user.id) ? JSON.stringify(user.id) : user.id)
           });
@@ -347,7 +347,7 @@ var AuthController = {
     var validatePassword = function validatePassword(passport, next) {
       var password = request.param('password');
 
-      passport.validatePassword(password, function callback(error, matched) {
+      sails.models.passport.validatePassword(passport, password, function callback(error, matched) {
         if (error) {
           next({message: 'Invalid password'});
         } else {
@@ -365,11 +365,11 @@ var AuthController = {
      */
     var callback = function callback(error, result) {
       if (error) {
-        response.json(401, error);
+        response.status(401).json(error);
       } else if (result) {
-        response.json(200, result);
+        response.status(200).json(result);
       } else {
-        response.json(400, {message: 'Given password does not match.'});
+        response.status(400).json({message: 'Given password does not match.'});
       }
     };
 

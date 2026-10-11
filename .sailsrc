@@ -5,6 +5,7 @@
     }
   },
   "hooks": {
-    "session" : false
+    "session": false,
+    "grunt": false
   }
 }

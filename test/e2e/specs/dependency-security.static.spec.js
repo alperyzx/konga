@@ -8,7 +8,7 @@ const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
 test.describe('security dependency upgrades', () => {
   test('removes the deprecated Slack SDK and uses built-in HTTPS', () => {
     const dependencies = require(path.join(ROOT, 'package.json')).dependencies;
-    const helper = read('api/helpers/utils.js');
+    const helper = read('api/lib/utils.js');
 
     expect(dependencies['@slack/client']).toBeUndefined();
     expect(helper).toContain("require('https')");

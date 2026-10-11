@@ -27,8 +27,5 @@ module.exports = function created(data, options) {
   sails.log.silly('res.created() :: Sending 201 ("CREATED") response');
 
   // Set status code
-  response.status(201);
-
-  // Backend will always response JSON
-  return response.jsonx(data);
+  return response.status(201).json(data);
 };

@@ -16,7 +16,7 @@ var fs = require('fs');
 module.exports = {
   /***************************************************************************
    * Set the default database connection for models in the production        *
-   * environment (see config/connections.js and config/models.js )           *
+   * environment (see config/datastores.js and config/models.js )            *
    ***************************************************************************/
 
   hookTimeout: process.env.KONGA_HOOK_TIMEOUT || 60000,
@@ -24,7 +24,7 @@ module.exports = {
   // kong_admin_url : process.env.KONG_ADMIN_URL || 'http://127.0.0.1:8001',
 
   // models: {
-  //   connection: 'someMysqlServer'
+  //   datastore: 'someMysqlServer'
   // },
 
   /***************************************************************************
@@ -33,7 +33,7 @@ module.exports = {
 
   port: process.env.PORT || 1337,
 
-  host: process.env.HOST || "0.0.0.0",
+  explicitHost: process.env.HOST || "0.0.0.0",
 
   ssl: {
     key: process.env.SSL_KEY_PATH ? fs.readFileSync(process.env.SSL_KEY_PATH) : null,

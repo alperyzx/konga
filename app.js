@@ -39,7 +39,7 @@ try {
 // Validate node version
 const Utils = require('./api/services/Utils');
 if(!Utils.isRuntimeVersionSupported()) {
-  sails.log.error("Incompatible Node.js version. Please make sure that you have Node.js >= 8 installed.")
+  sails.log.error("Incompatible Node.js version. Please make sure that you have Node.js >= 20.19 installed.")
   process.exit(1);
 }
 
@@ -71,6 +71,5 @@ require("./makedb")(function (err) {
   // Start server
   sails.lift(rc('sails'));
 });
-
 
 

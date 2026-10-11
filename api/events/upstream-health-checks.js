@@ -21,7 +21,7 @@ const sendmail = require('sendmail')({
     },
     silent: false
 })
-const Utils = require("../helpers/utils");
+const Utils = require("../lib/utils");
 
 let tasks = {};
 
