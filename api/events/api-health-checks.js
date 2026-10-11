@@ -5,7 +5,7 @@
 var events = require('events');
 var _ = require('lodash')
 var eventEmitter = new events.EventEmitter();
-var unirest = require('unirest')
+var unirest = require('../lib/http-client')
 var cron = require('node-cron');
 var path = require('path')
 var tasks = {}
@@ -23,7 +23,7 @@ var sendmail = require('sendmail')({
     },
     silent: false
 })
-var Utils = require("../helpers/utils");
+var Utils = require("../lib/utils");
 
 
 module.exports = {

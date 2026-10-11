@@ -27,7 +27,8 @@
  *  http://sailsjs.org/#/documentation/reference/sails.config/sails.config.cors.html
  *
  */
-module.exports.cors = {
+module.exports.security = {
+  cors: {
   /***************************************************************************
    *                                                                          *
    * Allow CORS on all routes by default? If not, you must enable CORS on a   *
@@ -45,14 +46,14 @@ module.exports.cors = {
    * "*" to allow all domains CORS access.                                    *
    *                                                                          *
    ***************************************************************************/
-  origin: '*',
+  allowOrigins: '*',
 
   /***************************************************************************
    *                                                                          *
    * Allow cookies to be shared for CORS requests?                            *
    *                                                                          *
    ***************************************************************************/
-  credentials: false,
+  allowCredentials: false,
 
   /***************************************************************************
    *                                                                          *
@@ -60,7 +61,7 @@ module.exports.cors = {
    * response to preflight requests (see article linked above for more info)  *
    *                                                                          *
    ***************************************************************************/
-  methods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH',
+  allowRequestMethods: 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH',
 
   /***************************************************************************
    *                                                                          *
@@ -68,5 +69,6 @@ module.exports.cors = {
    * response to preflight requests.                                          *
    *                                                                          *
    ***************************************************************************/
-  headers: 'content-type, access-control-allow-origin, authorization, kong-admin-url'
+  allowRequestHeaders: 'content-type, access-control-allow-origin, authorization, kong-admin-url'
+  }
 };

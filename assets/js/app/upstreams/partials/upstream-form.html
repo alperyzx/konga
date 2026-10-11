@@ -75,6 +75,13 @@
             <p class="help-block">Use the SRV record name for the Host header instead of the resolved target address.</p>
         </div>
     </div>
+    <div class="form-group" ng-if="compareKongVersion('2.0.0') >= 0" ng-class="{'has-error' : errors.client_certificate}">
+        <label class="col-sm-3 control-label">Client certificate</label>
+        <div class="col-sm-8">
+            <input ng-model="upstream.client_certificate.id" class="form-control" placeholder="Certificate ID">
+            <p class="help-block">Certificate used for mutual TLS when connecting to targets.</p>
+        </div>
+    </div>
     <!--/ LOAD BALANCER -->
 
     <!-- has_on -->
@@ -90,6 +97,8 @@
                 <option value="ip">ip</option>
                 <option value="header">header</option>
                 <option value="cookie">cookie</option>
+                <option value="query_arg">query_arg</option>
+                <option value="uri_capture">uri_capture</option>
             </select>
             <div class="text-danger" ng-if="errors.hash_on" data-ng-bind="errors.hash_on"></div>
             <p class="help-block">
@@ -110,6 +119,8 @@
                 <option value="consumer">consumer</option>
                 <option value="ip">ip</option>
                 <option value="header">header</option>
+                <option value="query_arg">query_arg</option>
+                <option value="uri_capture">uri_capture</option>
             </select>
             <div class="text-danger" ng-if="errors.hash_fallback" data-ng-bind="errors.hash_fallback"></div>
             <p class="help-block">
@@ -146,6 +157,24 @@
                 The header name to take the value from as hash input. Only required when <code>hash_fallback </code> is set to <code>header</code>.
             </p>
         </div>
+    </div>
+
+    <!-- hash_on_cookie -->
+    <div class="form-group" ng-if="upstream.hash_on === 'query_arg'" ng-class="{'has-error' : errors.hash_on_query_arg}">
+        <label class="col-sm-3 control-label">Hash on query argument</label>
+        <div class="col-sm-8"><input ng-model="upstream.hash_on_query_arg" class="form-control"></div>
+    </div>
+    <div class="form-group" ng-if="upstream.hash_fallback === 'query_arg'" ng-class="{'has-error' : errors.hash_fallback_query_arg}">
+        <label class="col-sm-3 control-label">Hash fallback query argument</label>
+        <div class="col-sm-8"><input ng-model="upstream.hash_fallback_query_arg" class="form-control"></div>
+    </div>
+    <div class="form-group" ng-if="upstream.hash_on === 'uri_capture'" ng-class="{'has-error' : errors.hash_on_uri_capture}">
+        <label class="col-sm-3 control-label">Hash on URI capture</label>
+        <div class="col-sm-8"><input ng-model="upstream.hash_on_uri_capture" class="form-control"></div>
+    </div>
+    <div class="form-group" ng-if="upstream.hash_fallback === 'uri_capture'" ng-class="{'has-error' : errors.hash_fallback_uri_capture}">
+        <label class="col-sm-3 control-label">Hash fallback URI capture</label>
+        <div class="col-sm-8"><input ng-model="upstream.hash_fallback_uri_capture" class="form-control"></div>
     </div>
 
     <!-- hash_on_cookie -->
@@ -213,6 +242,17 @@
         </h5>
     </div>
     <div ng-show="showActiveHealthChecks">
+        <div class="form-group" ng-if="compareKongVersion('2.0.0') >= 0">
+            <label class="col-sm-3 control-label">Probe headers</label>
+            <div class="col-sm-8">
+                <div class="row margin-bottom" ng-repeat="row in activeHealthHeaders track by $index">
+                    <div class="col-sm-4"><input class="form-control" ng-model="row.name" placeholder="Header name"></div>
+                    <div class="col-sm-7"><input class="form-control" ng-list="," ng-model="row.values" placeholder="Comma-separated values"></div>
+                    <div class="col-sm-1"><button type="button" class="btn btn-link" ng-click="removeActiveHealthHeader($index)"><i class="mdi mdi-delete"></i></button></div>
+                </div>
+                <button type="button" class="btn btn-default btn-sm" ng-click="addActiveHealthHeader()">Add header</button>
+            </div>
+        </div>
         <!-- 'healthchecks.active.https_verify_certificate -->
         <div class="form-group" ng-if="compareKongVersion('0.12.0') >= 0" ng-class="{'has-error' : errors['healthchecks.active.https_verify_certificate']}">
             <label class="col-sm-3 control-label">Verify https certificate

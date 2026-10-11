@@ -20,21 +20,26 @@ module.exports.models = {
      * connections (see `config/connections.js`)                                *
      *                                                                          *
      ***************************************************************************/
-    connection: process.env.DB_ADAPTER || 'localDiskDb',
+    datastore: process.env.DB_ADAPTER || 'localDiskDb',
     migrate: 'alter',
 
     updateOrCreate: function(criteria, values, cb){
         var self = this; // reference for use by callbacks
         // If no values were specified, use criteria
         if (!values) values = criteria.where ? criteria.where : criteria;
+        criteria = _.pickBy(criteria, function(value) { return value !== undefined; });
 
-        this.findOne(criteria, function (err, result){
+        if (_.isEmpty(criteria)) {
+            return self.create(values).fetch().exec(cb);
+        }
+
+        this.findOne(criteria).exec(function (err, result){
             if(err) return cb(err, false);
 
             if(result){
-                self.update(criteria, values, cb);
+                self.update(criteria, values).fetch().exec(cb);
             }else{
-                self.create(values, cb);
+                self.create(values).fetch().exec(cb);
             }
         });
     },
@@ -47,7 +52,7 @@ module.exports.models = {
      */
     seed: function (callback) {
         var self = this;
-        var modelName = self.adapter.identity.charAt(0).toUpperCase() + self.adapter.identity.slice(1);
+        var modelName = self.identity.charAt(0).toUpperCase() + self.identity.slice(1);
         if (!self.seedData) {
             sails.log.debug('No data available to seed ' + modelName);
             callback();
@@ -81,7 +86,7 @@ module.exports.models = {
 
     updateRecords : function (callback) {
         var self = this;
-        var modelName = self.adapter.identity.charAt(0).toUpperCase() + self.adapter.identity.slice(1);
+        var modelName = self.identity.charAt(0).toUpperCase() + self.identity.slice(1);
         self.find({}).exec(function (err, results) {
             if (err) {
                 sails.log.debug(err);
@@ -126,7 +131,7 @@ module.exports.models = {
 
     seedArray: function (callback) {
         var self = this;
-        var modelName = self.adapter.identity.charAt(0).toUpperCase() + self.adapter.identity.slice(1);
+        var modelName = self.identity.charAt(0).toUpperCase() + self.identity.slice(1);
         self.createEach(self.seedData).exec(function (err, results) {
             if (err) {
                 sails.log.debug(err);
@@ -139,7 +144,7 @@ module.exports.models = {
     },
     seedObject: function (callback) {
         var self = this;
-        var modelName = self.adapter.identity.charAt(0).toUpperCase() + self.adapter.identity.slice(1);
+        var modelName = self.identity.charAt(0).toUpperCase() + self.identity.slice(1);
         self.create(self.seedData).exec(function (err, results) {
             if (err) {
                 sails.log.debug(err);

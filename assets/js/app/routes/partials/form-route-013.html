@@ -224,6 +224,22 @@
     </p>
   </div>
 </div>
+<div class="form-group" ng-if="isGatewayVersionEqOrGreater('2.0.0')">
+  <label class="col-sm-3 control-label">Request Buffering</label>
+  <div class="col-sm-9">
+    <input bs-switch ng-model="route.request_buffering" switch-size="small"
+           type="checkbox" switch-on-text="YES" switch-off-text="NO" />
+    <p class="help-block">Buffer the complete client request before proxying it upstream.</p>
+  </div>
+</div>
+<div class="form-group" ng-if="isGatewayVersionEqOrGreater('2.0.0')">
+  <label class="col-sm-3 control-label">Response Buffering</label>
+  <div class="col-sm-9">
+    <input bs-switch ng-model="route.response_buffering" switch-size="small"
+           type="checkbox" switch-on-text="YES" switch-off-text="NO" />
+    <p class="help-block">Buffer the upstream response before sending it to the client.</p>
+  </div>
+</div>
 <div class="form-group" ng-class="{'has-error' : errors.protocols}">
   <label class="col-sm-3 control-label"
     >Protocols <br /><em

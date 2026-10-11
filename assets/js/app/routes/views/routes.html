@@ -51,7 +51,7 @@
 
                         <i
                                 uib-tooltip="Strip Path"
-                                ng-click="toggleStripPath(route)"
+                                ng-click="toggleRouteOption(route, 'strip_path')"
                                 data-ng-class="{'text-primary' : route.strip_path,'text-muted' : !route.strip_path}"
                                 class="mdi mdi-link-off clickable">
                         </i>
@@ -59,7 +59,7 @@
                     <td ng-if="user.hasPermission($state.name.split('.')[0],'edit')">
                         <i
                                 uib-tooltip="Preserve Host"
-                                ng-click="route.preserve_host=!route.preserve_host;updateRoute(route.id,{preserve_host : route.preserve_host})"
+                                ng-click="toggleRouteOption(route, 'preserve_host')"
                                 class="mdi clickable" ng-class="route.preserve_host ? 'mdi-cloud-outline text-primary' : 'mdi-cloud-off-outline text-muted'">
 
                         </i>
@@ -104,4 +104,3 @@
         <dir-pagination-controls class="pull-right"></dir-pagination-controls>
     </div>
 </div>
-

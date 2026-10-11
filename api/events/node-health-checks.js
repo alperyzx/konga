@@ -23,7 +23,7 @@ var sendmail = require('sendmail')({
     silent: false
 })
 
-var Utils = require("../helpers/utils");
+var Utils = require("../lib/utils");
 
 module.exports = {
     emit : function(event,data) {

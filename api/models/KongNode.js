@@ -12,11 +12,9 @@ var defSeedData = require('../../config/default-seed-data.js');
  */
 var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
   tableName: "konga_kong_nodes",
-  autoPK: false,
   attributes: {
     id: {
-      type: 'integer',
-      primaryKey: true,
+      type: 'number',
       unique: true,
       autoIncrement: true
     },
@@ -27,7 +25,7 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
 
     type: {
       type: 'string',
-      enum: ['default', 'key_auth', 'jwt', 'basic_auth'],
+      isIn: ['default', 'key_auth', 'jwt', 'basic_auth'],
       defaultsTo: 'default'
     },
 
@@ -54,7 +52,7 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
      */
     jwt_algorithm: {
       type: 'string',
-      enum: ['HS256', 'RS256'],
+      isIn: ['HS256', 'RS256'],
       defaultsTo: 'HS256'
     },
 
@@ -80,7 +78,6 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
 
     kong_version: {
       type: 'string',
-      required: true,
       defaultsTo: '0-10-x'
     },
     health_checks: {
@@ -92,7 +89,6 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
     },
     active: {
       type: 'boolean',
-      required: true,
       defaultsTo: false
     }
   },
@@ -102,7 +98,7 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
     sails.log("KongNode:afterDestroy:called => ", values);
 
     // Stop health checks
-    values.forEach(function (node) {
+    [].concat(values || []).forEach(function (node) {
       HealthCheckEvents.emit('health_checks.stop', node);
     })
 
@@ -160,16 +156,15 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
 
 var mongoModel = function () {
   var obj = _.cloneDeep(defaultModel)
-  delete obj.autoPK
   delete obj.attributes.id
   return obj;
 }
 
-if (sails.config.models.connection == 'postgres' && process.env.DB_PG_SCHEMA) {
+if (sails.config.models.datastore == 'postgres' && process.env.DB_PG_SCHEMA) {
   defaultModel.meta = {
     schemaName: process.env.DB_PG_SCHEMA
   }
 }
 
 
-module.exports = sails.config.models.connection == 'mongo' ? mongoModel() : defaultModel
+module.exports = sails.config.models.datastore == 'mongo' ? mongoModel() : defaultModel

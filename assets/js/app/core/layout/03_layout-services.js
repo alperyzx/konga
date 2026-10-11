@@ -79,7 +79,7 @@
           {
             state: 'key-sets', icon: 'mdi-key-chain',
             show: function() { return AuthService.isAuthenticated() && $rootScope.Gateway; },
-            title: 'Keys', access: AccessLevels.user
+            title: 'Keys & Vaults', access: AccessLevels.user
           }
         ];
       }

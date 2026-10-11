@@ -1,6 +1,6 @@
 'use strict';
 
-var request = require('supertest');
+var request = require('../../helpers/supertest');
 var expect = require('chai').expect;
 var login = require("./../../helpers/login");
 var _ = require('lodash');
@@ -13,6 +13,8 @@ describe('Generic controller test', function controllerTest() {
             url: '/api/user/',
             identifier: 1,
             count: 2,
+            countFilter: {active: true},
+            filteredCount: 2,
             data: {
                 identifier: {
                     username: "admin",
@@ -46,6 +48,8 @@ describe('Generic controller test', function controllerTest() {
             url: '/api/kongnode/',
             identifier: 1,
             count: 1,
+            countFilter: {active: false},
+            filteredCount: 1,
             data: {
                 identifier: {
                     name : "default",
@@ -511,6 +515,30 @@ describe('Generic controller test', function controllerTest() {
                                 }
                             );
                     });
+
+                    it('should support the list-page sort and pagination criteria', function it(done) {
+                        request(sails.hooks.http.app)
+                            .get(testCase.url)
+                            .query({
+                                where: JSON.stringify({}),
+                                limit: 25,
+                                skip: 0,
+                                sort: 'createdAt DESC'
+                            })
+                            .set('Authorization', 'bearer ' + tokenDemo)
+                            .set('Content-Type', 'application/json')
+                            .expect(200)
+                            .end(function end(error, result) {
+                                if (error) return done(error);
+
+                                expect(result.res.body).to.be.an('array');
+                                result.res.body.forEach(function(record) {
+                                    expect(record.createdAt).to.be.a('number');
+                                    expect(record.updatedAt).to.be.a('number');
+                                });
+                                done();
+                            });
+                    });
                 });
 
                 describe('GET ' + testCase.url + testCase.identifier, function findOneRecord() {
@@ -557,7 +585,7 @@ describe('Generic controller test', function controllerTest() {
                                         return done(error);
                                     }
 
-                                    expect(result.res.text).to.equal('No record found with the specified `id`.');
+                                    expect(result.res.text).to.equal('');
 
                                     done();
                                 }
@@ -584,6 +612,21 @@ describe('Generic controller test', function controllerTest() {
                                     done();
                                 }
                             );
+                    });
+
+                    it('should parse a JSON where filter from list pages', function it(done) {
+                        request(sails.hooks.http.app)
+                            .get(testCase.url + 'count')
+                            .query({where: JSON.stringify(testCase.countFilter)})
+                            .set('Authorization', 'bearer ' + tokenDemo)
+                            .set('Content-Type', 'application/json')
+                            .expect(200)
+                            .end(function end(error, result) {
+                                if (error) return done(error);
+
+                                expect(result.res.body).to.deep.equal({count: testCase.filteredCount});
+                                done();
+                            });
                     });
                 });
 

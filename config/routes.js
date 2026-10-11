@@ -70,11 +70,19 @@ module.exports.routes = {
 
 
   '/404': {
-    view: '404'
+    view: '404',
+    locals: {
+      angularDebugEnabled: false,
+      data: 'The requested page could not be found.'
+    }
   },
 
   '/500': {
-    view: '500'
+    view: '500',
+    locals: {
+      angularDebugEnabled: false,
+      data: 'An unexpected server error occurred.'
+    }
   },
 
   // First time registration

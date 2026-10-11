@@ -16,6 +16,9 @@
         $scope.upstream = {
           slots: 1000
         }
+        $scope.activeHealthHeaders = []
+        $scope.addActiveHealthHeader = function () { $scope.activeHealthHeaders.push({name: '', values: []}) }
+        $scope.removeActiveHealthHeader = function (index) { $scope.activeHealthHeaders.splice(index, 1) }
 
         if($rootScope.compareKongVersion('0.12.0') >= 0) {
          $scope.upstream['hash_on'] = 'none';
@@ -39,6 +42,11 @@
 
           $scope.busy = true
           var data = angular.copy($scope.upstream)
+          var headers = {}
+          $scope.activeHealthHeaders.forEach(function (row) {
+            if (row.name) headers[row.name] = row.values || []
+          })
+          if (Object.keys(headers).length) _.set(data, 'healthchecks.active.headers', headers)
 
           // Fix non numeric arrays
           var arr = ["active.healthy", "active.unhealthy", "passive.healthy", "passive.unhealthy"];

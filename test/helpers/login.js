@@ -1,6 +1,6 @@
 'use strict';
 
-var request = require("supertest");
+var request = require('./supertest');
 
 /**
  * Generic helper function to authenticate specified user with current sails testing instance. Function

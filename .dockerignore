@@ -68,6 +68,7 @@ config/local.js
 
 node_modules
 bower_components
+test/e2e/node_modules
 
 
 
@@ -80,6 +81,10 @@ bower_components
 ################################################
 .tmp
 dump.rdb
+kongadata
+test-results
+test/e2e/test-results
+test/e2e/playwright-report
 
 
 
@@ -115,6 +120,7 @@ npm-debug.log
 .netbeans
 nbproject
 .idea
+.vscode
 .node_history
 /logs/*
 !/logs/.gitkeep

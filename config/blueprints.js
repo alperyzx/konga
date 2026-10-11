@@ -120,8 +120,6 @@ module.exports.blueprints = {
    * may result in very heavy api calls                                       *
    *                                                                          *
    ***************************************************************************/
-  populate: false,
-
   /****************************************************************************
    *                                                                           *
    * Whether to run Model.watch() in the find and findOne blueprint actions.   *
@@ -143,5 +141,14 @@ module.exports.blueprints = {
    * true.                                                                     *
    *                                                                           *
    ****************************************************************************/
-  defaultLimit: 4294967295
+  parseBlueprintOptions: function(req) {
+    var options = req._sails.hooks.blueprints.parseBlueprintOptions(req);
+    options.populates = {};
+
+    if (req.options.blueprintAction === 'find' && !req.param('limit')) {
+      options.criteria.limit = 4294967295;
+    }
+
+    return options;
+  }
 };

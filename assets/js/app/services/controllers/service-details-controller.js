@@ -13,6 +13,11 @@
 
         var availableFormattedVersion = ServiceService.getLastAvailableFormattedVersion($rootScope.Gateway.version);
         $scope.settings = SettingsService.getSettings();
+        $scope.tlsVerifyOptions = [
+          {label: 'Use Kong default', value: null},
+          {label: 'Enabled', value: true},
+          {label: 'Disabled', value: false}
+        ];
         $scope.tags = [];
         $scope.partial = 'js/app/services/partials/form-service-' + availableFormattedVersion + '.html?r=' + Date.now();
 

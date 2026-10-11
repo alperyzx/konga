@@ -11,6 +11,14 @@
       '$log', '$state', '$http', 'Semver',
       function ($log, $state, $http, Semver) {
 
+        function normalizeService(service) {
+          var data = angular.copy(service);
+          if (data.tls_verify === 'true') data.tls_verify = true;
+          if (data.tls_verify === 'false') data.tls_verify = false;
+          if (data.tls_verify === 'null' || data.tls_verify === '') data.tls_verify = null;
+          return data;
+        }
+
 
         /**
          *
@@ -48,6 +56,16 @@
               props.tags = [];
             }
 
+            if (Semver.cmp(version, "3.4.0") >= 0) {
+              props.enabled = true;
+            }
+
+            if (Semver.cmp(version, "2.0.0") >= 0) {
+              props.tls_verify = null;
+              props.tls_verify_depth = null;
+              props.ca_certificates = [];
+            }
+
             return props;
           },
 
@@ -68,8 +86,9 @@
             return $http.get('kong/services/' + serviceId)
           },
 
-          update: function (service) {
-            return $http.patch('kong/services/' + service.id, service)
+          update: function (service, data) {
+            var serviceId = data ? service : service.id
+            return $http.patch('kong/services/' + serviceId, normalizeService(data || service))
           },
 
           getTags: function () {
@@ -81,7 +100,7 @@
           },
 
           add: function (service) {
-            return $http.post('kong/services/', service)
+            return $http.post('kong/services/', normalizeService(service))
           },
 
           plugins: function (serviceId,params) {

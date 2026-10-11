@@ -1,0 +1,6 @@
+{
+  "name": "findup-sync",
+  "version": "5.0.1",
+  "main": "index.js",
+  "license": "MIT"
+}

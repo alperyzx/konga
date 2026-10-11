@@ -43,14 +43,14 @@ else if(argv._[0] === 'prepare') {
   // Validate node version
   const Utils = require('../api/services/Utils');
   if(!Utils.isRuntimeVersionSupported()) {
-    console.error("Incompatible Node.js version. Please make sure that you have Node.js >= 8 installed.")
+    console.error("Incompatible Node.js version. Please make sure that you have Node.js >= 20.19 installed.")
     process.exit(1);
   }
 
   Sails.log("Preparing database...")
 
   if(!process.env.DB_ADAPTER && !argv.adapter) {
-    Sails.log.error("No db adapter defined. Set --adapter {mongo || mysql || postgres || sql-srv}")
+    Sails.log.error("No db adapter defined. Set --adapter {mongo || mysql || postgres}")
     return process.exit(1);
   }
 

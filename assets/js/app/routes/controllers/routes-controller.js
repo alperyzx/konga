@@ -11,7 +11,7 @@
         RouteModel.setScope($scope, false, 'items', 'itemCount');
         $scope = angular.extend($scope, angular.copy(ListConfig.getConfig('route', RouteModel)));
         $scope.user = UserService.user()
-        $scope.toggleStripPath = toggleStripPath
+        $scope.toggleRouteOption = toggleRouteOption
         $scope.openAddRouteModal = openAddRouteModal
         $scope.updateRoute = updateRoute
 
@@ -26,24 +26,31 @@
 
           $scope.loading = true
 
-          RouteModel.update(id, data)
+          return RoutesService.update(id, data)
             .then(function (res) {
               console.log("Update Route: ", res)
               $scope.loading = false
               _fetchData()
+              return res
             }).catch(function (err) {
-            $log.error("Update Route: ", err)
-            $scope.loading = false;
-          });
+              $log.error("Update Route: ", err)
+              $scope.loading = false;
+              throw err
+            });
 
         }
 
-        function toggleStripPath(route) {
-          route.strip_path = !route.strip_path;
+        function toggleRouteOption(route, property) {
+          var previousValue = route[property]
+          route[property] = !previousValue;
 
-          $scope.updateRoute(route.id, {
-            strip_path: route.strip_path
-          })
+          var update = {}
+          update[property] = route[property]
+
+          return $scope.updateRoute(route.id, update)
+            .catch(function () {
+              route[property] = previousValue
+            })
         }
 
 

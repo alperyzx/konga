@@ -2,7 +2,7 @@
 
 var async = require('async');
 var _ = require('lodash');
-var uuidv4 = require('uuid/v4');
+var uuidv4 = require('uuid').v4;
 var UserSignUp = require("../events/user-events")
 
 /**
@@ -97,6 +97,7 @@ var AuthController = {
 
     sails.models.user
       .create(_.omit(data, ['password', 'password_confirmation']))
+      .fetch()
       .exec(function (err, user) {
         if (err) {
           console.log(err.invalidAttributes)
@@ -149,6 +150,7 @@ var AuthController = {
 
         sails.models.user
           .create(data)
+          .fetch()
           .exec(function (err, user) {
             if (err) return res.negotiate(err)
 
@@ -217,9 +219,14 @@ var AuthController = {
    * @param   {Response}  response    Response object
    */
   logout: function logout(request, response) {
-    request.logout();
+    request.logout(function(error) {
+      if (error) {
+        sails.log.error('User logout failed', error);
+        return response.serverError(error);
+      }
 
-    response.json(200, true);
+      response.status(200).json(true);
+    });
   },
 
   /**
@@ -245,9 +252,9 @@ var AuthController = {
    */
   authenticated: function authenticated(request, response) {
     if (request.isAuthenticated()) {
-      response.json(200, request.user);
+      response.status(200).json(request.user);
     } else {
-      response.json(200, false);
+      response.status(200).json(false);
     }
   },
 
@@ -270,6 +277,10 @@ var AuthController = {
   callback: function callback(request, response) {
     sails.services.passport.callback(request, response, function callback(error, user) {
 
+      if (error || !user) {
+        return response.status(401).json(error || {});
+      }
+
       // User must be active
       if (user && !user.active) {
         return response.forbidden({
@@ -278,18 +289,18 @@ var AuthController = {
       }
 
 
-      request.login(user, function callback(error) {
+      request.login(user, {session: false}, function callback(error) {
         // If an error was thrown, redirect the user to the login which should
         // take care of rendering the error messages.
         if (error) {
           sails.log.verbose('User authentication failed');
           sails.log.verbose(error);
 
-          response.json(401, error);
+          response.status(401).json(error);
         } else { // Upon successful login, send back user data and JWT token
 
 
-          response.json(200, {
+          response.status(200).json({
             user: user,
             token: sails.services.token.issue(_.isObject(user.id) ? JSON.stringify(user.id) : user.id)
           });
@@ -342,7 +353,7 @@ var AuthController = {
     var validatePassword = function validatePassword(passport, next) {
       var password = request.param('password');
 
-      passport.validatePassword(password, function callback(error, matched) {
+      sails.models.passport.validatePassword(passport, password, function callback(error, matched) {
         if (error) {
           next({message: 'Invalid password'});
         } else {
@@ -360,11 +371,11 @@ var AuthController = {
      */
     var callback = function callback(error, result) {
       if (error) {
-        response.json(401, error);
+        response.status(401).json(error);
       } else if (result) {
-        response.json(200, result);
+        response.status(200).json(result);
       } else {
-        response.json(400, {message: 'Given password does not match.'});
+        response.status(400).json({message: 'Given password does not match.'});
       }
     };
 

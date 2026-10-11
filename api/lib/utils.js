@@ -1,11 +1,12 @@
 /**
- * Created by user on 07/10/2017.
+ * Shared runtime utilities.
  */
 
 'use strict'
 
 var moment = require("moment");
 var _ = require("lodash");
+var https = require('https');
 
 module.exports = {
 
@@ -36,24 +37,33 @@ module.exports = {
 
     if (!slack || !slack.config.enabled) return;
 
-    // Send notification to slack
-    var IncomingWebhook = require('@slack/client').IncomingWebhook;
-
     var field = _.find(slack.config.fields, function (item) {
       return item.id == 'slack_webhook_url'
     })
 
     var url = field ? field.value : "";
+    if (!url) return sails.log.error('Slack notification failed: webhook URL is empty');
 
-    var webhook = new IncomingWebhook(url);
-
-    webhook.send(message, function (err, header, statusCode, body) {
-      if (err) {
-        sails.log('Error:', err);
+    var payload = JSON.stringify(typeof message === 'string' ? {text: message} : message);
+    var request = https.request(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    }, function (response) {
+      response.resume();
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        sails.log('Slack notification sent');
       } else {
-        sails.log('Received', statusCode, 'from Slack');
+        sails.log.error('Slack notification failed with HTTP status', response.statusCode);
       }
     });
+
+    request.on('error', function (error) {
+      sails.log.error('Slack notification failed', error);
+    });
+    request.end(payload);
   },
 
   /**

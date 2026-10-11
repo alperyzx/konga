@@ -14,6 +14,11 @@
                           $uibModalInstance, MessageService) {
 
         $scope.tags = [];
+        $scope.tlsVerifyOptions = [
+          {label: 'Use Kong default', value: null},
+          {label: 'Enabled', value: true},
+          {label: 'Disabled', value: false}
+        ];
         var availableFormattedVersion = ServiceService.getLastAvailableFormattedVersion($rootScope.Gateway.version);
         $scope.service = angular.copy(ServiceService.getProperties($rootScope.Gateway.version));
 

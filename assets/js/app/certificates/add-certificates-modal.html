@@ -31,6 +31,16 @@
         <textarea ng-model="data.key" class="form-control" rows="10" style="font-size: .8em"></textarea>
         <div class="text-danger" ng-if="errors.key" data-ng-bind="errors.key"></div>
     </div>
+    <div class="form-group" ng-class="{'has-error' : errors.cert_alt}">
+        <label class="control-label">Alternate Certificate <small class="help-block">optional; requires alternate key</small></label>
+        <textarea ng-model="data.cert_alt" class="form-control" rows="8" style="font-size: .8em"></textarea>
+        <div class="text-danger" ng-if="errors.cert_alt" data-ng-bind="errors.cert_alt"></div>
+    </div>
+    <div class="form-group" ng-class="{'has-error' : errors.key_alt}">
+        <label class="control-label">Alternate Key <small class="help-block">optional; requires alternate certificate</small></label>
+        <textarea ng-model="data.key_alt" class="form-control" rows="8" style="font-size: .8em"></textarea>
+        <div class="text-danger" ng-if="errors.key_alt" data-ng-bind="errors.key_alt"></div>
+    </div>
     <div class="form-group" ng-class="{'has-error' : errors.snis}" ng-if="!data.id">
         <label class="control-label">Server Name Indications</label>
         <p class="help-block">A comma separated list of Server Name Indications. ex: <code>ssl-example.com,other-ssl-example.com</code></p>

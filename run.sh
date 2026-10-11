@@ -33,13 +33,12 @@ while [ "$#" -gt 0 ]; do
 done
 
 if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
-  echo "Node.js and npm are required. Konga supports Node.js 8 through 12.x." >&2
+  echo "Node.js 20.19 or newer and npm are required." >&2
   exit 1
 fi
 
-NODE_MAJOR="$(node -p "process.versions.node.split('.')[0]")"
-if [ "$NODE_MAJOR" -lt 8 ] || [ "$NODE_MAJOR" -gt 12 ]; then
-  echo "Unsupported Node.js version: $(node --version). Use Node.js 8 through 12.x for this legacy Konga release." >&2
+if ! node -e "const [major, minor] = process.versions.node.split('.').map(Number); process.exit(major > 20 || (major === 20 && minor >= 19) ? 0 : 1)"; then
+  echo "Unsupported Node.js version: $(node --version). Use Node.js 20.19 or newer." >&2
   exit 1
 fi
 
