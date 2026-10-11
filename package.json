@@ -16,17 +16,16 @@
     "bower": "^1.8.8",
     "dotenv": "^6.2.0",
     "ejs": "^2.7.4",
-    "grunt": "^1.5.3",
-    "grunt-contrib-clean": "^1.1.0",
-    "grunt-contrib-concat": "^1.0.1",
+    "grunt": "^1.6.3",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-concat": "^2.1.0",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "^2.2.1",
-    "grunt-contrib-jst": "^1.0.0",
-    "grunt-contrib-sass": "^1.0.0",
-    "grunt-contrib-uglify-es": "^3.3.0",
+    "grunt-contrib-cssmin": "^5.0.0",
+    "grunt-contrib-jst": "^2.0.0",
+    "grunt-contrib-uglify": "^5.2.2",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-sails-linker": "~0.10.1",
-    "grunt-sass": "^3.1.0",
+    "grunt-sails-linker": "^1.0.4",
+    "grunt-sass": "^4.1.0",
     "grunt-sync": "^0.8.2",
     "include-all": "^4.0.3",
     "ip": "^1.1.5",
@@ -37,7 +36,7 @@
     "mkdirp": "^0.5.5",
     "moment": "^2.31.0",
     "node-cron": "^1.2.1",
-    "node-sass": "^4.13.1",
+    "sass": "^1.105.1",
     "nodemailer": "^4.7.0",
     "nodemailer-mailgun-transport": "^1.4.0",
     "passport": "^0.7.0",
@@ -57,18 +56,20 @@
     "validator": "^13.15.35"
   },
   "devDependencies": {
-    "chai": "3.4.0",
-    "mocha": "^5.2.0",
-    "should": "7.1.1",
-    "supertest": "1.1.0"
+    "chai": "^4.5.0",
+    "mocha": "^12.0.3",
+    "supertest": "^7.3.1"
   },
   "scripts": {
     "postinstall": "bower --allow-root install",
-    "start": "node --harmony app.js",
-    "production": "node --harmony app.js --prod",
-    "debug": "node debug app.js",
-    "test": "mocha",
+    "start": "node app.js",
+    "production": "node app.js --prod",
+    "debug": "node inspect app.js",
+    "test": "mocha --timeout 60000 --reporter spec --ui bdd \"test/**/*.test.js\"",
     "bower-deps": "bower --allow-root install"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   },
   "main": "app.js",
   "repository": {

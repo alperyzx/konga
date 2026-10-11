@@ -1,6 +1,6 @@
 'use strict';
 
-var request = require('supertest');
+var request = require('../../helpers/supertest');
 var expect = require('chai').expect;
 var login = require("./../../helpers/login");
 var _ = require('lodash');

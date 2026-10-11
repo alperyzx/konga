@@ -5,7 +5,7 @@
 if [ $# -eq 0 ]
   then
     # If no args are set, start the app as usual
-    node --harmony app.js
+    node app.js
   else
     while getopts "c:a:u:" option
     do
@@ -30,7 +30,6 @@ if [ $# -eq 0 ]
             exit
     fi
 fi
-
 
 
 

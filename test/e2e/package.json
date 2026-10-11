@@ -2,7 +2,7 @@
   "name": "konga-e2e",
   "version": "0.0.0",
   "private": true,
-  "description": "Browser and source-tree tests for the Konga admin UI. Deliberately a separate package so it never participates in Konga's root install, which pins sails 0.12 / node-sass 4 and only builds on Node 12.",
+  "description": "Browser and source-tree tests for the Konga admin UI, kept separate from the application dependency tree.",
   "scripts": {
     "test": "playwright test",
     "test:static": "playwright test --project=static",

@@ -1,7 +1,5 @@
 # Local build for arm64 (Apple Silicon).
-# Differs from ./Dockerfile only by installing a C++/python2 toolchain, because
-# node-sass 4.x ships no prebuilt binary for linux-musl-arm64 and must compile.
-FROM node:12.16-alpine
+FROM node:20-alpine
 
 COPY . /app
 
@@ -9,10 +7,9 @@ WORKDIR /app
 
 RUN apk upgrade --update \
     && apk add bash git ca-certificates \
-    && apk add --virtual .build-deps python2 make g++ \
     && npm install -g bower \
     && npm --unsafe-perm --production install \
-    && apk del git .build-deps \
+    && apk del git \
     && rm -rf /var/cache/apk/* \
         /app/.git \
         /app/screenshots \

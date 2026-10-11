@@ -3,11 +3,10 @@
 Regression tests for the Konga admin UI, covering Phase 1 (the removal of the
 APIs module) and Phase 2 (the schema-driven plugin form).
 
-This is a **separate npm package** on purpose. Konga's root install pins
-sails 0.12 and node-sass 4, which only build on Node 12; the published container
-is a `--production` install and has no test runner in it at all. Keeping the
-suite here means it installs in a couple of seconds on a modern Node and never
-has to participate in that.
+This is a **separate npm package** on purpose. The published container is a
+`--production` install and has no test runner in it. Keeping the suite here
+means it installs quickly and does not add browser tooling to Konga's runtime
+dependency tree.
 
 ## Install
 
