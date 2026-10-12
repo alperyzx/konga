@@ -222,18 +222,18 @@ Bootstrap 3 and Bootswatch sources; application Sass warnings remain visible.
 
 ### Production
 
-***************************************************************************************** 
-In case of `MySQL` or `PostgresSQL` adapters, Konga will not perform db migrations when running in production mode.
+*****************************************************************************************
+Production mode uses Waterline's `migrate: safe` setting and will not alter an existing database
+schema. For MySQL or PostgreSQL, the `prepare` command loads Konga in development migration mode
+and lets Waterline synchronize the schema. Back up the database and verify the operation against a
+clone before running it on production data.
 
-You can manually perform the migrations by calling ```$ node ./bin/konga.js  prepare``` 
-, passing the args needed for the database connectivity.
-
-For example: 
+For example:
 
 ```
 $ node ./bin/konga.js  prepare --adapter postgres --uri postgresql://localhost:5432/konga
 ```
-The process will exit after all migrations are completed. 
+The process exits after Waterline finishes its schema synchronization.
 
 *****************************************************************************************
 
@@ -361,13 +361,29 @@ The UI suite requires Konga, Kong, an installed Chrome-family browser, and `KONG
 
 
 ## Upgrading
-In some cases a newer version of Konga may introduce changes in database schemas.
-The only thing you need to do is to start Konga in dev mode once so that the migrations will be applied.
-Then stop the app and run it again in production mode.
 
-if you're using docker, you can lift an ephemeral container, as stated before:
-```
-$ docker run --rm pantsel/konga:latest -c prepare -a {{adapter}} -u {{connection-uri}}
+Kong configuration is stored by Kong and is not dependent on Konga's datastore. Konga's own users,
+password records, connections, settings, and saved snapshots are stored in the configured Konga
+datastore and need separate upgrade planning.
+
+Do not point development mode or `prepare` at the only copy of a production datastore. Waterline's
+development migration mode uses automatic `alter` operations; it is not a versioned migration and
+can change data or schema unexpectedly across the Sails 0.12 to Sails 1 adapter upgrade.
+
+- **Bundled local datastore:** Konga 0.14 used `sails-disk` 0.10 and a single
+  `kongadata/konga.db` file. Konga 0.26.10 uses `sails-disk` 2 and separate per-model files. Copying
+  the old file into the new installation is not a supported migration. Use a fresh Konga datastore
+  and recreate Konga users, connections, and settings.
+- **MySQL or PostgreSQL:** Back up the database, restore it to a disposable clone, run
+  `./run.sh --prepare <adapter> <clone-uri>`, and verify users, login, connections, settings, and
+  snapshots. Only repeat the operation against production after that validation succeeds.
+- **MongoDB:** It does not require relational schema preparation, but the major Sails/adapter upgrade
+  should still be tested against a cloned database before production use.
+
+For a Docker-based MySQL or PostgreSQL preparation run:
+
+```bash
+docker run --rm pantsel/konga:latest -c prepare -a {{adapter}} -u {{connection-uri}}
 ```
 
 ## FAQ
