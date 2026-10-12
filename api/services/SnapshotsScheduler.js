@@ -33,7 +33,11 @@ module.exports = {
 
             sails.log.error("SnapshotScheduler:Running scheduled task", "Fetch node", node);
 
-            SnapshotsService.snapshot(null, node);
+            SnapshotsService.snapshot(null, node, {
+              includeSensitiveData: schedule.include_sensitive_data === true
+            }).catch(function (snapshotError) {
+              sails.log.error('SnapshotScheduler:Snapshot creation failed', snapshotError);
+            });
 
           });
 

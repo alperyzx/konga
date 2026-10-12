@@ -9,31 +9,6 @@ const KongService = require('../services/KongService');
 const SnapshotsService = require('../services/SnapshotsService');
 const _ = require('lodash')
 const async = require('async');
-const fs = require('fs');
-const semver = require('semver');
-
-/**
- * Custom logic functions
- */
-
-function makeResponseData(responseData, key)  {
-  if (!responseData[key]) {
-    responseData[key] = {
-      imported: 0,
-      failed: {
-        count: 0,
-        items: []
-      }
-    };
-  }
-}
-
-function makeResponseDataError(responseData, entity, error) {
-  responseData[entity].failed.count++;
-  if (responseData[entity].failed.items.indexOf(_.get(error, 'body.message', JSON.stringify(error))) < 0) {
-    responseData[entity].failed.items.push(_.get(error, 'body.message', JSON.stringify(error)))
-  }
-}
 
 module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
@@ -61,7 +36,10 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
         message: "Invalid Kong Node"
       })
       try {
-        const snapshot = await SnapshotsService.snapshot(req.param('name'), node);
+        const snapshot = await SnapshotsService.snapshot(req.param('name'), node, {
+          includeSensitiveData: req.param('include_sensitive_data') === true ||
+            req.param('include_sensitive_data') === 'true'
+        });
         return res.json(snapshot);
       } catch (e) {
         return res.negotiate(e)
@@ -84,141 +62,30 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
       res.ok(); // Reply directly because snapshot creation may take some time
 
-      SnapshotsService.takeSnapShot(req.param("name"), node, function (err, ok) {
-        // Fire and forget.
-        // Everything is handled by events and socket messages.
-
+      SnapshotsService.snapshot(req.param("name"), node, {
+        includeSensitiveData: req.param('include_sensitive_data') === true ||
+          req.param('include_sensitive_data') === 'true'
+      }).catch(function (err) {
+        sails.log.error('Snapshot creation failed', err);
       });
     });
   },
 
   restore: async (req, res) => {
+    try {
+      const snapshot = await sails.models.snapshot.findOne({id: req.params.id});
+      if (!snapshot) return res.notFound({message: 'Snapshot not found'});
 
-    const snaphsot_id = req.params.id;
-    let responseData = {}
-
-    sails.models.snapshot.findOne({
-      id: snaphsot_id
-    }).exec(async (err, snapshot) => {
-      if (err) return res.negotiate(err)
-      if (!snapshot) res.notFound({
-        message: 'Snapshot not found'
-      })
-
-      // Fix put imports in correct order
-      const requestedImports = req.param("imports") || Object.keys(snapshot.data);
-      sails.log('SnapshotsController:restore:requestedImports', requestedImports);
-
-      try {
-        await Promise.all(requestedImports.map(async (entity) => {
-          if (entity === 'consumers') {
-            if (snapshot.data['consumers']) {
-              makeResponseData(responseData, 'consumers');
-              await Promise.all(snapshot.data['consumers'].map(async (consumer) => {
-                try {
-                  await KongService.put(`/${entity}/${consumer.id}`, req.connection, _.omit(consumer, ["id", "credentials"]));
-                  responseData['consumers'].imported++;
-
-                  // Apply credentials to the consumer
-                  const plural2singularMAP = {
-                    'basic-auths': 'basic-auth',
-                    'key-auths': 'key-auth',
-                    'hmac-auths': 'hmac-auth',
-                    'jwts': 'jwt'
-                  }
-                  for (let key in consumer.credentials) {
-                    makeResponseData(responseData, key);
-                    if (consumer.credentials[key].length) {
-                      await Promise.all(consumer.credentials[key].map(async (cred) => {
-                        const singularKey = plural2singularMAP[key] || key;
-                        try {
-                          await KongService.post(`/consumers/${consumer.id}/${singularKey}`, req.connection, _.omit(cred, ["id", "consumer"]));
-                          responseData[key].imported++;
-                        } catch (e) {
-
-                          makeResponseDataError(responseData, key, e);
-
-                          if (e.statusCode && e.statusCode === 409) {
-                            // A UNIQUE violation detected.
-                            // That means the credential already exists.
-                            sails.log(_.get(e, 'body.message'))
-                          } else {
-                            sails.log.error(`Create consumer credentials error =>`, e);
-                          }
-                        }
-                      }));
-                    }
-                  }
-                }catch (e) {
-                  makeResponseDataError(responseData, 'consumers', e);
-                }
-              }));
-            }
-
-          } else if (entity === 'upstreams') {
-
-            makeResponseData(responseData, 'upstreams');
-            makeResponseData(responseData, 'upstream_targets');
-
-            if (snapshot.data['upstreams']) {
-              // Create upstreams
-              await Promise.all(snapshot.data['upstreams'].map(async (upstream) => {
-                try {
-                  await KongService.put(`/upstreams/${upstream.id}`, req.connection, _.omit(upstream, ["id", "targets"]));
-                  responseData['upstreams'].imported++;
-                  // Create the upstream targets if needed
-                  if (upstream.targets) {
-                    await Promise.all(upstream.targets.map(async (target) => {
-                      try {
-                        await KongService.post(`/upstreams/${upstream.id}/targets`, req.connection, _.pick(target, ["target", "weight"]));
-                        responseData['upstream_targets'].imported++;
-                      } catch (e) {
-                        makeResponseDataError(responseData, 'upstream_targets', e);
-                        if (e.statusCode && e.statusCode === 409) {
-                          // A UNIQUE violation detected.
-                          // That means the credential already exists.
-                          sails.log(_.get(e, 'body.message'))
-                        } else {
-                          sails.log.error(`Create upstream targets error =>`, e);
-                        }
-                      }
-                    }));
-                  }
-                }catch (e) {
-                  makeResponseDataError(responseData, 'upstreams', e);
-                }
-              }));
-            }
-          } else {
-            if (snapshot.data[entity]) {
-              makeResponseData(responseData, entity);
-
-              await Promise.all(snapshot.data[entity].map(async (item) => {
-                try {
-                  await KongService.put(`/${entity}/${item.id}`, req.connection, _.omit(item, ["id", "extras"]));
-                  responseData[entity].imported++;
-                } catch (e) {
-
-                  makeResponseDataError(responseData, entity, e);
-
-                  if (e.statusCode && e.statusCode === 409) {
-                    // A UNIQUE violation detected.
-                    // That means the credential already exists.
-                    sails.log(_.get(e, 'body.message'))
-                  } else {
-                    sails.log.error(`Create ${entity} error =>`, e);
-                  }
-                }
-              }));
-            }
-          }
-        }));
-        return res.json(responseData);
-      } catch (err) {
-        sails.log.error(err);
-        return res.negotiate(err);
-      }
-    });
+      const responseData = await SnapshotsService.restore(
+        snapshot,
+        req.connection,
+        req.param('imports')
+      );
+      return res.json(responseData);
+    } catch (err) {
+      sails.log.error(err);
+      return res.negotiate(err);
+    }
   },
 
   // restore: function (req, res) {
@@ -635,34 +502,15 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
 
   download: function (req, res) {
     var id = req.param('id');
-    var SkipperDisk = require('skipper-disk');
-    var fileAdapter = SkipperDisk(/* optional opts */);
-
-
     sails.models.snapshot.findOne({
       id: id
     }).exec(function (err, data) {
       if (err) return res.negotiate(err)
       if (!data) return res.notFound()
-
-      var location = sails.config.paths.uploads + "snapshot_" + data.id + ".json";
-
-      if (fs.existsSync(location)) {
-        fileAdapter.read(location).on('error', function (err) {
-          return res.negotiate(err);
-        }).pipe(res);
-      } else {
-        fs.writeFile(location, JSON.stringify(data), 'utf8',
-          function (err, file) {
-            if (err) return res.negotiate(err)
-            fileAdapter.read(location).on('error', function (err) {
-              return res.negotiate(err);
-            }).pipe(res);
-          });
-      }
-
+      res.attachment('snapshot_' + data.id + '.json');
+      res.type('application/json');
+      return res.send(JSON.stringify(data, null, 2));
     })
   }
 
 });
-

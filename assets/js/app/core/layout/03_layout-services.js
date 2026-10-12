@@ -62,7 +62,7 @@
             state: 'upstreams',
             icon : 'mdi-shuffle-variant',
             show : function() {
-              return AuthService.isAuthenticated() && UserService.user().node && $rootScope.Gateway && $rootScope.Gateway.version.indexOf("0.10.") > -1
+              return AuthService.isAuthenticated() && $rootScope.Gateway && $rootScope.isGatewayVersionEqOrGreater('0.10.0')
             },
             title: 'Upstreams',
             access: AccessLevels.anon
@@ -71,7 +71,7 @@
             state: 'certificates',
             icon : 'mdi-certificate',
             show : function() {
-              return AuthService.isAuthenticated() && UserService.user().node && $rootScope.Gateway && $rootScope.Gateway.version.indexOf("0.10.") > -1
+              return AuthService.isAuthenticated() && $rootScope.Gateway && $rootScope.isGatewayVersionEqOrGreater('0.10.0')
             },
             title: 'Certificates',
             access: AccessLevels.anon

@@ -53,6 +53,7 @@
             <td>
                 {{prettyCron(item.cron)}}
             </td>
+            <td>{{item.include_sensitive_data ? 'Included' : 'Excluded'}}</td>
             <td>{{item.createdAt | date : "MMM d, y @HH:mm"}}</td>
             <td>
                 <button class="btn btn-danger btn-link" ng-click="deleteItem($index,item)">

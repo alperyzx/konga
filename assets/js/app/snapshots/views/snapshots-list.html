@@ -8,15 +8,15 @@
             <input type="file" ng-model="file.data"
                    id="import-snapshot"
                    class="hidden"
+                   accept=".json,application/json"
                    file-select="data"
                    file-loaded="onSnapshotLoaded()"
                    file-error="onSnapshotReadError($error)"
                    file-progress="onSnapshotReadProgress($total,$loaded)">
-            <button
-                    class="btn btn-link btn-warning" ng-click="importSnapshot()">
+            <label for="import-snapshot" class="btn btn-link btn-warning" role="button" tabindex="0">
                 <i class="mdi mdi-upload"></i>
                 import from file
-            </button>
+            </label>
         </div>
         <list-search
                 class="pull-right margin-right"

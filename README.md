@@ -9,6 +9,7 @@ _Konga is not an official app. No affiliation with [Kong](https://www.konghq.com
 
 - [**Discussions & Support**](#discussions--support)
 - [**Features**](#features)
+- [**Snapshot backups**](#snapshot-backups)
 - [**Compatibility**](#compatibility)
 - [**Prerequisites**](#prerequisites)
 - [**Used libraries**](#used-libraries)
@@ -33,6 +34,7 @@ If you need to discuss anything Konga related, we have a chatroom on Gitter:
 * Configure service TLS trust, route streaming buffers, advanced upstream hashing/health probes, alternate certificates, and tagged SNIs.
 * Create and edit Key Sets, JWK/PEM Keys, and backend-specific Vault configuration from the Keys & Vaults area.
 * Render plugin configuration from the schemas exposed by the connected Kong node.
+* Edit `pre-function` and `post-function` Lua safely in multiline phase editors without wrapping, splitting, or trimming pasted source.
 * Import Consumers from remote sources (Databases, files, APIs etc.).
 * Manage multiple Kong Nodes.
 * Backup, restore and migrate Kong Nodes using Snapshots.
@@ -41,6 +43,64 @@ If you need to discuss anything Konga related, we have a chatroom on Gitter:
 * Multiple users and local authentication, with an [LDAP implementation guide](./docs/LDAP.md).
 * Browse entity tags and inspect Kong capabilities, metrics, and runtime log level.
 * Easy database integration (MySQL, postgresSQL, MongoDB).
+
+## Snapshot backups
+
+Snapshot format v2 backs up the Kong configuration exposed by the selected node's Admin API.
+Each snapshot records which collections were included, which optional collections were unavailable,
+and which data categories are intentionally excluded. Restores run in dependency order, preserve
+entity IDs where Kong supports them, and report imported, skipped, and failed items separately.
+
+Included by default when the source Kong exposes them:
+
+* Services, routes, consumers, plugins, upstreams, and targets.
+* CA certificates, key sets, and vault entities/configuration metadata.
+* ACL and mTLS credentials.
+* Consumer groups and memberships, and DeGraphQL routes.
+
+The **Include sensitive data** option is disabled by default. Enabling it additionally includes:
+
+* Certificates, their private keys, and SNIs.
+* JWK/PEM key entities, including private key material.
+* Key Auth, HMAC Auth, JWT, and restorable OAuth2 credentials.
+* OAuth2 tokens and authorization codes.
+
+Manual and scheduled snapshots both expose this option. Each schedule stores its own setting;
+existing schedules default to excluding sensitive data.
+
+Use **Export** to download a snapshot JSON file and **Import from file** to add that file to another
+Konga installation's snapshot library. Importing does not immediately change Kong; review the
+imported snapshot and explicitly choose the entities and destination node during restore. Konga
+prefixes the imported name with a timestamp to avoid name conflicts. The same restore exclusions
+for Basic Auth and OAuth2 `hash_secret=true` credentials also apply to imported legacy files.
+
+Not included:
+
+* Konga's own users, Kong connections, settings, and audit/application data. Back up Konga's
+  configured datastore or `STORAGE_PATH` separately for those records.
+* Kong runtime metrics, logs, health state, cache contents, or database internals.
+* Secret values held in external vault backends. Vault references and Kong vault configuration are
+  included, but the external secret store requires its own backup.
+* Basic Auth credentials. Kong exposes only one-way password hashes; restoring an exported hash
+  would hash it again and the original plaintext password would no longer authenticate. Recreate
+  Basic Auth passwords manually after restore.
+* OAuth2 credentials configured with `hash_secret=true`. Kong exposes only their one-way PBKDF2
+  client-secret hashes, which would also be hashed again during restore. Recreate those OAuth2
+  client secrets manually. OAuth2 credentials using the default `hash_secret=false` are included
+  only when **Include sensitive data** is enabled.
+* Enterprise or plugin-specific collections that the source node does not expose through a supported
+  Admin API endpoint. These appear in the snapshot's unavailable list rather than failing the backup.
+
+Plugin configurations and vault metadata may themselves contain sensitive references or values, so
+all snapshots still require protection even when the sensitive-data option is disabled.
+
+Snapshots are stored as records in Konga's configured database. With the bundled local datastore,
+those records are under `STORAGE_PATH` (default `./kongadata/`); Docker deployments commonly persist
+them in the `/app/kongadata` volume. Snapshot records and exported JSON can contain usable credential
+secrets, OAuth tokens, certificate private keys, and private JWK/PEM material. Protect the Konga
+database, local data directory, Docker volume, datastore backups, and exported snapshot files as
+secrets. Snapshots created without the sensitive-data option omit the known credential, OAuth state,
+certificate/private-key, and Kong key collections listed above.
 
 ## Compatibility
 Konga `0.26.x` targets **Kong 3.x** and is currently validated against Kong `3.9.3`
@@ -315,6 +375,10 @@ $ npm run bower-deps
 When a plugin property is an array, the input is handled by a chip component.
 You will need to press `enter` after every value you type in
 so that the component assigns it to an array index.
+The `pre-function` and `post-function` plugins are an exception: each phase uses a repeatable
+multiline Lua editor. Use **add script** under the required phase (for example, **access**) and
+paste the complete Lua source into that editor. Each editor is submitted unchanged as one array
+entry; use another editor only when Kong should execute an additional script in that phase.
 See issue [#48](https://github.com/pantsel/konga/issues/48) for reference.
 
 ##### 3. EACCES permission denied, mkdir '/kongadata/'.

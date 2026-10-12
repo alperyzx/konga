@@ -91,7 +91,7 @@
                         ariaLabelledBy: 'modal-title',
                         ariaDescribedBy: 'modal-body',
                         templateUrl: 'js/app/snapshots/views/take-snapshot-modal.html',
-                        size : 'sm',
+                        size : 'lg',
                         backdrop: 'static',
                         keyboard: false,
                         controller: function($scope,$rootScope,$log,$uibModalInstance,SnapshotsService,MessageService,UserService) {
@@ -99,7 +99,8 @@
                             $scope.user = UserService.user()
                             $scope.node = $scope.user.node;
                             $scope.snapshot = {
-                                name : ''
+                                name : '',
+                                include_sensitive_data: false
                             }
                             $scope.close = function(){
                                 $uibModalInstance.dismiss()
@@ -115,7 +116,11 @@
                                 }
 
                                 $scope.submitting = true;
-                                SnapshotsService.snapshot($scope.snapshot.name,$scope.node.id)
+                                SnapshotsService.snapshot(
+                                  $scope.snapshot.name,
+                                  $scope.node.id,
+                                  $scope.snapshot.include_sensitive_data
+                                )
                                   .then(function(response){
                                       MessageService.success('Snapshot Created!');
                                       $scope.submitting = false;
@@ -249,10 +254,6 @@
                 }
 
 
-                $scope.importSnapshot = function() {
-                    $("#import-snapshot").click();
-                }
-
                 $scope.onSnapshotLoaded = function(data) {
 
                     var importedSnapshot;
@@ -260,10 +261,16 @@
                     try{
                         importedSnapshot = JSON.parse($base64.decode($scope.file.data.split(",")[1]))
                     }catch(err){
-                        MessageService.error(err)
+                        MessageService.error('Could not read snapshot JSON. Make sure the exported file is valid.');
                     }
 
                     if(!importedSnapshot) return false;
+
+                    if(!importedSnapshot.name || !importedSnapshot.data ||
+                       typeof importedSnapshot.data !== 'object') {
+                        MessageService.error('Could not import snapshot. The file does not contain a valid snapshot.');
+                        return false;
+                    }
 
                     // Add timestamp to snapshot name to prevent conflicts and remove it's id and timestamps
                     importedSnapshot.name = new Date().getTime() + "_" + importedSnapshot.name
@@ -274,6 +281,10 @@
 
                     Snapshot.create(importedSnapshot)
                         .then(function(){
+                            MessageService.success('Snapshot imported successfully');
+                            $scope.file = {};
+                            var input = document.getElementById('import-snapshot');
+                            if(input) input.value = '';
                             _triggerFetchData()
                         }).catch(function(err){
                         // ToDo better error handling

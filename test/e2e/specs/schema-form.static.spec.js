@@ -91,6 +91,19 @@ test.describe(`SchemaFormService against Kong ${META.kong_version}`, () => {
   });
 
   test.describe('structure', () => {
+    test('serverless Lua arrays preserve one complete multiline script', () => {
+      const options = {
+        multilineArrayFields: { access: true },
+      };
+      const nodes = SchemaForm.normalize(SCHEMAS['pre-function'].fields, options);
+      const access = nodes.find((n) => n.name === 'access');
+      const source = 'local value = "a,b"\n-- keep newlines and braces\nkong.log.notice(value)';
+
+      expect(access.control).toBe('scripts');
+      SchemaForm.hydrate(nodes, { access: [source] });
+      expect(SchemaForm.serialize(nodes).access).toEqual([source]);
+    });
+
     test('records nest to whatever depth Kong uses', () => {
       // ai-request-transformer is the deepest plugin on 3.9.3 at five levels.
       // The template this replaces hand-unrolled three.

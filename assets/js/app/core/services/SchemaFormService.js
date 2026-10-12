@@ -40,6 +40,7 @@
     MAP_RECORD: 'map-record',// key -> nested fieldset
     ROWS: 'rows',            // array of records, as repeating rows
     CHIPS: 'chips',          // array/set of scalars
+    SCRIPTS: 'scripts',      // array of multiline source-code strings
     SELECT: 'select',        // anything with one_of, at any depth
     BOOLEAN: 'boolean',
     NUMBER: 'number',
@@ -89,7 +90,7 @@
     return pairs;
   }
 
-  function controlFor(descriptor) {
+  function controlFor(name, descriptor, options) {
     var type = descriptor.type;
 
     if (descriptor.one_of && descriptor.one_of.length) return CONTROL.SELECT;
@@ -105,6 +106,10 @@
 
     if (type === 'array' || type === 'set') {
       var elements = descriptor.elements || {};
+      if (elements.type === 'string' && options &&
+          options.multilineArrayFields && options.multilineArrayFields[name]) {
+        return CONTROL.SCRIPTS;
+      }
       return elements.type === 'record' ? CONTROL.ROWS : CONTROL.CHIPS;
     }
 
@@ -121,7 +126,7 @@
       name: name,
       label: name,
       type: descriptor.type,
-      control: controlFor(descriptor),
+      control: controlFor(name, descriptor, options),
       help: descriptor.description || helpFor(options, name),
       required: !!descriptor.required,
       referenceable: !!descriptor.referenceable,
@@ -156,6 +161,7 @@
         break;
 
       case CONTROL.CHIPS:
+      case CONTROL.SCRIPTS:
         node.elementType = (descriptor.elements || {}).type || 'string';
         node.value = [];
         break;
@@ -246,6 +252,7 @@
         break;
 
       case CONTROL.CHIPS:
+      case CONTROL.SCRIPTS:
         node.value = Array.isArray(value) ? deepClone(value) : [];
         break;
 
@@ -333,6 +340,7 @@
         return out;
 
       case CONTROL.CHIPS:
+      case CONTROL.SCRIPTS:
         out = [];
         (node.value || []).forEach(function (item) {
           var value = coerce(item, node.elementType);

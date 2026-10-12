@@ -17,9 +17,8 @@
                         data : {
                             access : 2,
                             pageName : "Snapshots",
-                            pageDescription : "Take snapshots of currently active nodes." +
-                            "<br>All <code>Services</code>, <code>Routes</code>, <code>APIs</code>, " +
-                            "<code>Plugins</code>, <code>Consumers</code>, <code>Upstreams</code> and <code>Targets</code>will be saved and available for later import.",
+                            pageDescription : "Back up and restore the complete Kong configuration exposed by the active node's Admin API." +
+                            "<br>Konga accounts/settings, runtime metrics/logs, database internals, and external vault secret values are not included.",
                             prefix : '<i class="mdi mdi-camera"></i>'
                         },
                         views: {

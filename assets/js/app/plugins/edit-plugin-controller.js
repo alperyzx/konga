@@ -21,6 +21,16 @@
         $scope.context = 'update';
 
         var options = new KongPluginsService().pluginOptions(_plugin.name);
+        if (_plugin.name === 'pre-function' || _plugin.name === 'post-function') {
+          options.multilineArrayFields = {
+            certificate: true,
+            rewrite: true,
+            access: true,
+            header_filter: true,
+            body_filter: true,
+            log: true
+          };
+        }
 
         $scope.close = close;
 
@@ -40,6 +50,9 @@
           },
           addRow: function (node) {
             node.rows.push(SchemaFormService.newRow(node));
+          },
+          addScript: function (node) {
+            node.value.push('');
           },
           removeAt: SchemaFormService.removeAt
         };

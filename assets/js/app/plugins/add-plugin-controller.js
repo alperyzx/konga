@@ -30,6 +30,16 @@
         $scope.context = 'create';
 
         var options = new KongPluginsService().pluginOptions(_pluginName)
+        if (_pluginName === 'pre-function' || _pluginName === 'post-function') {
+          options.multilineArrayFields = {
+            certificate: true,
+            rewrite: true,
+            access: true,
+            header_filter: true,
+            body_filter: true,
+            log: true
+          };
+        }
 
         $scope.pluginName = _pluginName
         $scope.close = close
@@ -55,6 +65,9 @@
           },
           addRow: function (node) {
             node.rows.push(SchemaFormService.newRow(node));
+          },
+          addScript: function (node) {
+            node.value.push('');
           },
           removeAt: SchemaFormService.removeAt
         };
