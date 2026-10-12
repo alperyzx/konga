@@ -30,6 +30,23 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
         kong_version: {
             type: 'string'
         },
+        backup_version: {
+            type: 'number',
+            defaultsTo: 1
+        },
+        includes_sensitive_data: {
+            type: 'boolean',
+            defaultsTo: false
+        },
+        included_entities: {
+            type: 'json'
+        },
+        unavailable_entities: {
+            type: 'json'
+        },
+        excluded_entities: {
+            type: 'json'
+        },
         data: {
             type: 'json',
             required: true

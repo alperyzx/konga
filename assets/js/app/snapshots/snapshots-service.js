@@ -17,10 +17,11 @@
                             node_id : node_id
                         });
                     },
-                    snapshot : function(name,node_id) {
+                    snapshot : function(name,node_id,include_sensitive_data) {
                         return $http.post('api/snapshots/snapshot',{
                             name : name,
-                            node_id : node_id
+                            node_id : node_id,
+                            include_sensitive_data: include_sensitive_data === true
                         });
                     },
                     restoreSnapshot : function(id,imports) {

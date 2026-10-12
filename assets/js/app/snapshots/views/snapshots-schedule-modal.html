@@ -114,6 +114,18 @@
             <label><input type="checkbox" ng-model="data.active">Start immediately</label>
         </div>
     </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="data.include_sensitive_data">
+                Include sensitive credentials, OAuth state, certificates/private keys, and Kong keys
+            </label>
+        </div>
+        <p class="help-block">
+            Disabled by default. Basic Auth and OAuth2 credentials with <code>hash_secret=true</code>
+            are always excluded because their one-way hashes cannot be restored.
+        </p>
+    </div>
 
     <br>
     <div class="form-group">

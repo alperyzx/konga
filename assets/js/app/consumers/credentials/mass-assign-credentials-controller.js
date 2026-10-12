@@ -6,6 +6,19 @@
 (function() {
   'use strict';
 
+  function generateSecureSecret(byteLength) {
+      if (!window.crypto || typeof window.crypto.getRandomValues !== 'function') {
+          throw new Error('Secure random number generation is not available in this browser.');
+      }
+
+      var bytes = new Uint8Array(byteLength)
+      window.crypto.getRandomValues(bytes)
+
+      return Array.prototype.map.call(bytes, function(byte) {
+          return byte.toString(16).padStart(2, '0')
+      }).join('')
+  }
+
   angular.module('frontend.consumers')
     .controller('MassAssignCredentialsController', [
         "$log","$q","$scope","$rootScope","$uibModalInstance","ConsumerService","DialogService",
@@ -57,7 +70,7 @@
                               _consumers.forEach(function(consumer){
                                   promises.push(ConsumerService.addCredential(consumer.id,credential,{
                                       username : consumer.username,
-                                      secret   : Math.random().toString(36).slice(-8)
+                                      secret   : generateSecureSecret(32)
                                   }))
                               })
                               break;

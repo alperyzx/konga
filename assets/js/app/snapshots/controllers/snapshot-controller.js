@@ -35,9 +35,14 @@
 
               $scope.ready = false;
               $scope.imports = []
+              $scope.hasHashedOauthCredentials = (_snapshot.data.oauth2_credentials || []).some(function (credential) {
+                return credential.hash_secret === true;
+              });
 
               $scope.objects = {}
-              Object.keys(_snapshot.data).forEach(function (item) {
+              Object.keys(_snapshot.data).filter(function (item) {
+                return item !== 'basic_auth_credentials';
+              }).forEach(function (item) {
                 $scope.objects[item] = {
                   isChecked: false
                 };
@@ -51,6 +56,13 @@
                     $scope.imports.push(key)
                   }
                 });
+              }
+
+              $scope.selectAll = function () {
+                Object.keys($scope.objects).forEach(function (key) {
+                  $scope.objects[key].isChecked = true
+                })
+                $scope.updateImports()
               }
 
               $scope.close = function () {

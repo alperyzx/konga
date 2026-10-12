@@ -10,12 +10,7 @@ const _ = require('lodash');
 
 function getParameterByName(name, url) {
   if (!url) url = window.location.href;
-  name = name.replace(/[\[\]]/g, '\\$&');
-  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-    results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  return new URL(url).searchParams.get(name);
 }
 
 var KongService = {
@@ -301,6 +296,18 @@ var KongService = {
     // sails.log("KongService.put called() =>", url, connection, data);
     return new Promise((resolve, reject) => {
       unirest.put(Utils.withoutTrailingSlash(connection.kong_admin_url) +url.replace('/kong', ''))
+        .headers(KongService.headers(connection, true))
+        .send(data)
+        .end(function (response) {
+          if (response.error) return reject(response);
+          return resolve(response.body);
+        });
+    })
+  },
+
+  patch: function (url, connection, data) {
+    return new Promise((resolve, reject) => {
+      unirest.patch(Utils.withoutTrailingSlash(connection.kong_admin_url) + url.replace('/kong', ''))
         .headers(KongService.headers(connection, true))
         .send(data)
         .end(function (response) {

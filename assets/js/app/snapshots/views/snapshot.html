@@ -6,6 +6,7 @@
             {{snapshot.name}}@{{snapshot.kong_node_name}}<br>
             <small>
                 Kong {{snapshot.kong_version.split('-').join('.')}}
+                &nbsp; Backup format v{{snapshot.backup_version || 1}}
                 &nbsp;
                 <i class="mdi mdi-calendar-blank mdi-18px"></i>
                 {{snapshot.createdAt | date}}
@@ -22,6 +23,26 @@
             <i class="mdi mdi-export"></i>
             export
         </a>
+    </div>
+</div>
+<div class="row" ng-if="!loading">
+    <div class="col-md-12">
+        <div class="alert alert-warning">
+            This backup may contain credentials, OAuth tokens, and private keys. Treat exported JSON as a secret.
+        </div>
+        <p ng-if="snapshot.included_entities && snapshot.included_entities.length">
+            <strong>Included:</strong> {{snapshot.included_entities.join(', ')}}
+        </p>
+        <p ng-if="snapshot.unavailable_entities && snapshot.unavailable_entities.length">
+            <strong>Unavailable on source Kong:</strong> {{snapshot.unavailable_entities.join(', ')}}
+        </p>
+        <p ng-if="snapshot.excluded_entities && snapshot.excluded_entities.length">
+            <strong>Not included:</strong> {{snapshot.excluded_entities.join(', ')}}
+        </p>
+        <p>
+            <strong>Sensitive data requested:</strong>
+            {{snapshot.includes_sensitive_data ? 'yes' : 'no'}}
+        </p>
     </div>
 </div>
 <div class="row">

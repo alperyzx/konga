@@ -183,6 +183,7 @@
 
           el.bind('change', function (e) {
             var fileName = e.target.files[0];
+            if (!fileName) return;
 
             if (fileType === '' || fileType === 'text') {
               fileReader.readAsText(fileName);

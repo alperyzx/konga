@@ -308,7 +308,7 @@
             state: 'upstreams',
             icon: 'mdi-shuffle-variant',
             show: function () {
-              return AuthService.hasPermission('upstreams', 'read') && UserService.user().node && $rootScope.isGatewayVersionEqOrGreater('0.10.0');
+              return AuthService.hasPermission('upstreams', 'read') && $rootScope.Gateway && $rootScope.isGatewayVersionEqOrGreater('0.10.0');
             },
             title: 'Upstreams',
             access: AccessLevels.anon
@@ -317,7 +317,7 @@
             state: 'certificates',
             icon: 'mdi-certificate',
             show: function () {
-              return AuthService.hasPermission('certificates', 'read') && UserService.user().node && $rootScope.isGatewayVersionEqOrGreater('0.10.0');
+              return AuthService.hasPermission('certificates', 'read') && $rootScope.Gateway && $rootScope.isGatewayVersionEqOrGreater('0.10.0');
             },
             title: 'Certificates',
             access: AccessLevels.anon
@@ -326,7 +326,7 @@
             state: 'key-sets',
             icon: 'mdi-key-chain',
             show: function () {
-              return AuthService.isAuthenticated() && UserService.user().node && $rootScope.isGatewayVersionEqOrGreater('3.0.0');
+              return AuthService.isAuthenticated() && $rootScope.Gateway && $rootScope.isGatewayVersionEqOrGreater('3.0.0');
             },
             title: 'Keys & Vaults',
             access: AccessLevels.user

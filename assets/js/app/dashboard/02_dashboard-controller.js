@@ -17,6 +17,7 @@
           var loadTime = $rootScope.KONGA_CONFIG.info_polling_interval,
               errorCount = 0,
               hasInitiallyLoaded = false,
+              initialLoadStarted = false,
               loadPromise;
 
           $scope.loading = true;
@@ -158,6 +159,7 @@
 
 
           function fetchData() {
+              initialLoadStarted = true
               if(!hasInitiallyLoaded) $scope.loading = true
               $log.debug("DashboardController:fetchData() called")
 
@@ -319,11 +321,16 @@
           };
 
           // clear the timeout when the view is destroyed
-          $scope.$on('$destroy', function() {
-              cancelNextLoad();
+          var stopGatewayWatch = $rootScope.$watch('Gateway', function(gateway) {
+              if(gateway && !initialLoadStarted) fetchData();
           });
 
-          $scope.$on('user.node.updated',function(node){
+          $scope.$on('$destroy', function() {
+              cancelNextLoad();
+              stopGatewayWatch();
+          });
+
+          $scope.$on('user.node.updated',function(ev, node){
               fetchData();
           })
       }

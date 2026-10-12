@@ -23,6 +23,10 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
             type : 'boolean',
             defaultsTo : true
         },
+        include_sensitive_data: {
+            type: 'boolean',
+            defaultsTo: false
+        },
         cron : {
             type : 'string',
             required : true
@@ -45,13 +49,9 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
     afterUpdate: function (values, cb) {
         sails.log("SnapshotSchedule:afterUpdate", values);
 
-
-        if(!values.active) {
-            // Stop cron job
-            Scheduler.remove(values);
-
-        }else{
-            // Start cron job
+        // Replace the task so cron and sensitive-data setting changes take effect.
+        Scheduler.remove(values);
+        if(values.active) {
             Scheduler.add(values);
         }
 

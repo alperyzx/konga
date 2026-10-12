@@ -493,6 +493,11 @@
               inTitle: true
             },
             {
+              title: 'Sensitive data',
+              column: 'include_sensitive_data',
+              inTitle: true
+            },
+            {
               title: 'created at',
               column: 'createdAt',
               sortable: true,

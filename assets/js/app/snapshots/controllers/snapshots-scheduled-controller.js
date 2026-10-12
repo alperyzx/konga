@@ -183,7 +183,8 @@
                                     dayOfWeek  : '*',
                                 },
                                 connection : null,
-                                active : true
+                                active : true,
+                                include_sensitive_data: false
                             }
 
                             $scope.cronString = "";
@@ -234,7 +235,8 @@
                                 var data = {
                                     cron : cron.join(" "),
                                     connection : $scope.data.connection,
-                                    active : $scope.data.active
+                                    active : $scope.data.active,
+                                    include_sensitive_data: $scope.data.include_sensitive_data === true
                                 };
 
 

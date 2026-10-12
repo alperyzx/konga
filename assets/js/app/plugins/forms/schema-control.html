@@ -100,6 +100,26 @@
         <p class="help-block">Tip: press <code>Enter</code> to accept a value.</p>
     </div>
 
+    <!-- Serverless-function phases are arrays because Kong can run several
+         chunks in sequence. A tag/chip input mutates multiline pastes, so each
+         array entry gets a real source editor and is serialized unchanged. -->
+    <div ng-switch-when="scripts">
+        <div class="well padding-sm margin-bottom" data-ng-repeat="script in $node.value track by $index">
+            <button type="button" class="btn btn-sm btn-link btn-danger pull-right"
+                    ng-click="schemaForm.removeAt($node.value, $index)">
+                <i class="mdi mdi-delete"></i>&nbsp;remove
+            </button>
+            <div class="clearfix"></div>
+            <textarea class="form-control plugin-script-editor"
+                      ng-model="$node.value[$index]" ng-trim="false" rows="14"
+                      spellcheck="false" wrap="off"></textarea>
+        </div>
+        <button type="button" class="btn btn-link btn-sm" ng-click="schemaForm.addScript($node)">
+            <i class="mdi mdi-plus"></i>&nbsp;add script
+        </button>
+        <p class="help-block">Each script is submitted unchanged as one Kong array entry.</p>
+    </div>
+
     <!-- Anything with one_of, at any depth. The old template offered a select
          only for top-level strings, so nested enums were free-text. -->
     <div ng-switch-when="select">

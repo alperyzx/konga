@@ -1,9 +1,10 @@
 FROM node:20-alpine AS dependencies
 
-RUN apk add --no-cache bash git ca-certificates
+RUN apk add --no-cache bash git ca-certificates openssl
 
 WORKDIR /app
 COPY package.json package-lock.json bower.json .bowerrc /app/
+COPY vendor /app/vendor
 RUN npm ci
 COPY . /app
 
@@ -28,7 +29,7 @@ RUN npm run build:prod \
 
 FROM node:20-alpine AS runtime
 
-RUN apk add --no-cache bash ca-certificates \
+RUN apk add --no-cache bash ca-certificates openssl \
     && adduser -H -S -g "Konga service owner" -D -u 1200 -s /sbin/nologin konga
 
 COPY --from=build /app /app

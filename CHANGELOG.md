@@ -12,16 +12,31 @@ All notable changes to this project will be documented in this file.
 * Completed create/edit workflows for Key Sets, Keys, and Vaults, including key names, JWK handling, key-set references, and Env vault configuration.
 * Consolidated parity navigation under Certificates and Keys & Vaults to keep the sidebar usable.
 * Added schema-driven entity support and Kong 3.x plugin schema coverage.
+* Replaced the chip controls for `pre-function` and `post-function` phases with repeatable multiline Lua editors, preserving pasted source code and trailing newlines exactly in Kong's script arrays.
 * Added CA Certificates, Key Sets, Keys, and Vaults management.
 * Added Tag Browser, deployment capability visibility, runtime log-level control, and Prometheus metrics viewing.
 * Fixed route chip conversion for headers, IPv4/IPv6 sources, destinations, malformed input, and round-trip editing.
 * Fixed the Route list Strip Path and Preserve Host quick actions to persist partial updates through Kong's PATCH API.
 * Added Service enable/disable controls to the Services list and create/edit forms.
 * Added a native legacy-environment launcher and LDAP implementation documentation.
+* Replaced partial snapshots with format-v2 Kong configuration backups covering services/routes, consumers and restorable credentials, plugins, upstreams/targets, certificates/SNIs/CAs, keys/key sets, vault metadata, OAuth state, consumer groups, and optional Admin API entities.
+* Added dependency-ordered, legacy-compatible restores with preserved IDs, idempotent targets and consumer-group memberships, detailed imported/skipped/failed results, and explicit included/unavailable/excluded manifests.
+* Excluded Basic Auth credentials from backup and restore because Kong exposes only one-way password hashes that cannot recreate working passwords.
+* Excluded OAuth2 credentials configured with `hash_secret=true` because Kong exposes only one-way PBKDF2 client-secret hashes; normal OAuth2 credentials remain restorable.
+* Fixed certificate restore to apply embedded SNI data only through the dedicated SNI collection, preventing duplicate-name conflicts.
+* Added a default-off **Include sensitive data** snapshot option for credentials, OAuth state, certificates/private keys, and Kong key entities while keeping one-way hashes permanently excluded.
+* Added the same persisted sensitive-data option and one-way-hash warning to scheduled snapshots.
+* Widened and reorganized the instant snapshot dialog with clearer node, content, security, and action sections.
+* Fixed snapshot JSON import to open the native file chooser reliably and added format validation and success/error feedback.
+* Documented that snapshot records are stored in Konga's database and that local data directories, Docker volumes, datastore backups, and exported files can contain usable secrets.
+* Fixed the Upstreams, Certificates, and Keys & Vaults sidebar entries being hidden when an active Gateway was loaded but the cached user node was stale.
+* Fixed a refresh race that could leave the Dashboard empty while active Gateway information was still loading.
 * Modernized the asset build and test tooling while retaining the AngularJS interface.
 * Replaced the vulnerable Git-based HTTP client with a native Fetch/FormData implementation and upgraded audited runtime dependencies.
 * Added local compatibility packages for abandoned transitive dependencies and removed obsolete Grunt watcher, `ip`, `unirest`, and SQL Server support.
 * Reached `0` known vulnerabilities in `npm audit`.
+* Resolved CodeQL findings for HMAC secret generation, query parsing, polynomial-time trimming, and OpenSSL command construction.
+* Made self-signed certificate generation concurrency-safe and included OpenSSL and local compatibility packages in clean Docker builds.
 * Added runtime coverage for every registered HTTP endpoint, authenticated list/count coverage for every model-backed API, and HTTP-client unit tests.
 * Isolated backend tests in an in-memory datastore so test runs never erase local users or Kong connections.
 * Corrected local datastore configuration to persist records under `STORAGE_PATH` (default `./kongadata/`).

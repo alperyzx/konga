@@ -2,7 +2,9 @@
 
 var unirest = require('../lib/http-client')
 var async = require('async')
+var execFile = require('child_process').execFile
 var fs = require('fs')
+var os = require('os')
 var path = require('path')
 var _ = require('lodash')
 var KongService = require('./KongService')
@@ -11,22 +13,36 @@ var KongService = require('./KongService')
 var KongPluginService = _.merge(_.cloneDeep(require('./KongService')), {
 
   makeSelfSignedCerts: function makeSelfSignedCerts(cb) {
-    var fds = []
-    var exec = require('child_process').exec;
-    var cert_path = path.join(__dirname, "..", "..", '.tmp')
-    var cmd = 'cd ' + cert_path + ' && openssl genrsa -out certificate.key 2048';
-    var key
-    var cert
-    exec(cmd, function (error, stdout, stderr) {
-      key = fs.readFileSync(path.join(__dirname, "..", "..", '.tmp/certificate.key'))
-      fds.push(key)
-      cmd = 'cd ' + cert_path + ' && openssl req -new -x509 -key certificate.key -out certificate.cert -days 3650 -subj /CN=cert';
-      exec(cmd, function (error, stdout, stderr) {
-        cert = fs.readFileSync(path.join(__dirname, "..", "..", '.tmp/certificate.cert'))
-        fds.push(cert)
-        cb(null, fds)
-      });
-    });
+    fs.mkdtemp(path.join(os.tmpdir(), 'konga-cert-'), function (error, certPath) {
+      if (error) return cb(error)
+
+      var keyPath = path.join(certPath, 'certificate.key')
+      var certificatePath = path.join(certPath, 'certificate.cert')
+      var args = [
+        'req', '-new', '-newkey', 'rsa:2048', '-nodes', '-x509',
+        '-keyout', keyPath, '-out', certificatePath,
+        '-days', '3650', '-subj', '/CN=cert'
+      ]
+
+      execFile('openssl', args, {shell: false}, function (execError) {
+        if (execError) return cleanup(execError)
+
+        fs.readFile(certificatePath, function (certError, cert) {
+          if (certError) return cleanup(certError)
+
+          fs.readFile(keyPath, function (keyError, key) {
+            if (keyError) return cleanup(keyError)
+            return cleanup(null, [cert, key])
+          })
+        })
+      })
+
+      function cleanup(resultError, certs) {
+        fs.rm(certPath, {recursive: true, force: true}, function (cleanupError) {
+          return cb(resultError || cleanupError, certs)
+        })
+      }
+    })
   },
 
   addDynamicSSLPlugin: function (fds, req, res) {
@@ -101,6 +117,7 @@ var KongPluginService = _.merge(_.cloneDeep(require('./KongService')), {
           // If no files where uploaded
           // generate self-signed certs
           KongPluginService.makeSelfSignedCerts(function (err, certs) {
+            if (err) return res.serverError(err)
             fds = certs
             return KongPluginService.addDynamicSSLPlugin(fds, req, res)
           })
