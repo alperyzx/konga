@@ -24,8 +24,11 @@
 
 module.exports.routes = {
   // See https://github.com/balderdashy/sails/issues/2062
-  'OPTIONS /*': function (req, res) {
-    res.send(200);
+  'OPTIONS /*': {
+    skipAssets: false,
+    fn: function (req, res) {
+      res.sendStatus(200);
+    }
   },
 
   '/': async (req, res) => {
@@ -163,7 +166,10 @@ module.exports.routes = {
    */
 
   'GET /kong': 'KongProxyController.proxy',
-  'GET /kong/*': 'KongProxyController.listProxy',
+  'GET /kong/*': {
+    action: 'KongProxy/listProxy',
+    skipAssets: false
+  },
   'POST /kong/*': 'KongProxyController.proxy',
   'PUT /kong/*': 'KongProxyController.proxy',
   'PATCH /kong/*': 'KongProxyController.proxy',

@@ -42,6 +42,8 @@ All notable changes to this project will be documented in this file.
 * Corrected local datastore configuration to persist records under `STORAGE_PATH` (default `./kongadata/`).
 * Added valid standalone 404/500 pages and expanded hard-reload Playwright verification against Kong 3.9.3.
 * Reworked the Docker image into test/build/runtime stages, added non-root execution, excluded local data from the build context, and restored production WebSocket, onboarding, and storage-path compatibility.
+* Removed local startup and asset-build deprecation warnings by modernizing custom JSON responses and wildcard routes, pruning retired policy targets and redundant Bower resolution data, and isolating legacy Bootstrap Sass notices.
+* Prevented development and production asset builds from rewriting tracked server-rendered views, and added regression coverage for warning-free startup configuration.
 
 ### Breaking changes
 * Node.js versions older than `20.19.0` are no longer supported.

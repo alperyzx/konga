@@ -216,6 +216,10 @@ Konga is available at `http://localhost:1337`. The Kong Admin API connection is 
 inside Konga; the development setup used for parity testing is Kong at `localhost:8001` and
 the Kong Manager at `localhost:8002`.
 
+The launcher and asset builds are expected to start without deprecation or framework-configuration
+warnings. Sass notices suppressed by the build are limited to deprecated constructs in the bundled
+Bootstrap 3 and Bootswatch sources; application Sass warnings remain visible.
+
 ### Production
 
 ***************************************************************************************** 
@@ -337,6 +341,7 @@ local Konga users, connections, or settings.
 ```bash
 npm test                 # backend, authentication, CRUD, and registered endpoint coverage
 npm audit                # dependency vulnerability report
+npm run build            # development asset build
 npm run build:prod       # production asset build
 cd test/e2e
 npm run test:static      # offline Angular/Kong schema regression suite
@@ -346,6 +351,10 @@ The backend suite discovers every route registered by Sails and checks that it d
 an uncaught server error. It also exercises sorted collections and filtered count requests for
 every model-backed API—the request shape used by list pages such as Users, Connections, and
 Snapshots.
+
+The static suite also guards the local startup configuration against retired Sails policy targets,
+deprecated response helpers, ambiguous wildcard routes, redundant Bower resolutions, and accidental
+rewrites of the tracked server layout during asset builds.
 
 For live Kong schema and browser tests, see the [browser test guide](./test/e2e/README.md).
 The UI suite requires Konga, Kong, an installed Chrome-family browser, and `KONGA_PASSWORD`.

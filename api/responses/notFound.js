@@ -45,5 +45,5 @@ module.exports = function notFound(data, options) {
   }
 
   // Backend will always response JSON
-  return response.jsonx(data);
+  return response.json(data);
 };

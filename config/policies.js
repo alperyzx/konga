@@ -28,14 +28,6 @@ module.exports.policies = {
 
   },
 
-  KongInfoController: {
-    '*': ['authenticated', 'dynamicNode'],
-  },
-
-  KongApiController: {
-    '*': ['authenticated', 'dynamicNode'],
-  },
-
   KongConsumersController: {
     '*': ['authenticated', 'dynamicNode']
   },
@@ -80,23 +72,6 @@ module.exports.policies = {
     'remove': ['authenticated', 'isAdmin']
   },
 
-  ApiController: {
-    'proxy': ['authenticated', 'activeNodeData'],
-  },
-
-  ConsumerController: {
-    '*': ['authenticated'],
-    'count': ['authenticated', 'activeNodeData'],
-    'find': ['authenticated', 'activeNodeData'],
-    'findOne': ['authenticated', 'activeNodeData'],
-    'create': ['authenticated', 'isAdmin', 'addDataCreate'],
-    'update': ['authenticated', 'isAdmin', 'addDataUpdate'],
-    'destroy': ['authenticated', 'isAdmin'],
-    'add': ['authenticated', 'isAdmin'],
-    'remove': ['authenticated', 'isAdmin'],
-    'sync': ['authenticated', 'isAdmin', 'dynamicNode', 'activeNodeData'],
-  },
-
   KongNodeController: {
     '*': ['authenticated'],
     'count': ['authenticated'],
@@ -107,19 +82,6 @@ module.exports.policies = {
     'destroy': ['authenticated', 'isAdmin'],
     'add': ['authenticated', 'isAdmin'],
     'remove': ['authenticated', 'isAdmin']
-  },
-
-  // User controller
-  KongGroupController: {
-    '*': ['authenticated', 'dynamicNode'],
-    'count': ['authenticated', 'dynamicNode'],
-    'find': ['authenticated', 'dynamicNode'],
-    'findOne': ['authenticated', 'dynamicNode'],
-    'create': ['authenticated', 'isAdmin', 'dynamicNode', 'addDataCreate'],
-    'update': ['authenticated', 'isAdmin', 'dynamicNode', 'addDataUpdate'],
-    'destroy': ['authenticated', 'isAdmin', 'dynamicNode'],
-    'add': ['authenticated', 'isAdmin', 'dynamicNode'],
-    'remove': ['authenticated', 'isAdmin', 'dynamicNode']
   },
 
   NetdataConnectionController: {
@@ -148,7 +110,7 @@ module.exports.policies = {
     'find': ['authenticated', 'isAdmin']
   },
 
-  UpstreamAlertsController: {
+  UpstreamAlertController: {
     'create': ['authenticated', 'isAdmin', 'addDataCreate'],
     'update': ['authenticated', 'isAdmin', 'addDataUpdate'],
     'remove': ['authenticated', 'isAdmin'],

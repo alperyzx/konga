@@ -40,5 +40,5 @@ module.exports = function serverError(data, options) {
   }
 
   // Backend will always response JSON
-  return res.jsonx(data);
+  return res.json(data);
 };

@@ -43,5 +43,5 @@ module.exports = function badRequest(data, options) {
   }
 
   // Backend will always response JSON
-  return response.jsonx(data);
+  return response.json(data);
 };

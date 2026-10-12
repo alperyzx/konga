@@ -30,5 +30,5 @@ module.exports = function sendOK(data, options) {
   response.status(200);
 
   // Backend will always response JSON
-  return response.jsonx(data);
+  return response.json(data);
 };
