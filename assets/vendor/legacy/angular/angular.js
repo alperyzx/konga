@@ -100,7 +100,7 @@ function minErr(module, ErrorConstructor) {
   ErrorConstructor = ErrorConstructor || Error;
 
   var url = 'https://errors.angularjs.org/1.8.3/';
-  var regex = url.replace('.', '\\.') + '[\\s\\S]*';
+  var regex = url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[\\s\\S]*';
   var errRegExp = new RegExp(regex, 'g');
 
   return function() {
@@ -471,6 +471,10 @@ function baseExtend(dst, objs, deep) {
     for (var j = 0, jj = keys.length; j < jj; j++) {
       var key = keys[j];
       var src = obj[key];
+
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
 
       if (deep && isObject(src)) {
         if (isDate(src)) {
@@ -1944,7 +1948,7 @@ function bootstrap(element, modules, config) {
       throw ngMinErr(
           'btstrpd',
           'App already bootstrapped with this element \'{0}\'',
-          tag.replace(/</,'&lt;').replace(/>/,'&gt;'));
+          tag.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
     }
 
     modules = modules || [];
@@ -3226,9 +3230,7 @@ function jqLiteBuildFragment(html, context) {
     // Convert html into DOM nodes
     tmp = fragment.appendChild(context.createElement('div'));
     tag = (TAG_NAME_REGEXP.exec(html) || ['', ''])[1].toLowerCase();
-    finalHtml = JQLite.legacyXHTMLReplacement ?
-      html.replace(XHTML_TAG_REGEXP, '<$1></$2>') :
-      html;
+    finalHtml = html;
 
     if (msie < 10) {
       wrap = wrapMapIE9[tag] || wrapMapIE9._default;
