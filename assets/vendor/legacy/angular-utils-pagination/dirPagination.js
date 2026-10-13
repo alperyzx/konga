@@ -80,7 +80,9 @@
                 addNgRepeatToElement(element, attrs, repeatExpression);
 
                 removeTemporaryAttributes(element);
-                var compiled =  $compile(element);
+                // This terminal directive deliberately replaces itself with ngRepeat and
+                // compiles the rewritten element once. It is not compiling user HTML.
+                var compiled =  $compile(element); // lgtm [js/angular/double-compilation]
 
                 var currentPageGetter = makeCurrentPageGetterFn(scope, attrs, paginationId);
                 paginationService.setCurrentPageParser(paginationId, currentPageGetter, scope);

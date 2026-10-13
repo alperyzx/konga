@@ -43,6 +43,11 @@
     .config(function ($logProvider) {
       $logProvider.debugEnabled(window.enableLogs);
     })
+    // AngularJS 1.6+ reports intentionally rejected modal-dismissal promises as
+    // unhandled errors. Konga uses those rejections only as cancellation signals.
+    .config(['$qProvider', function ($qProvider) {
+      $qProvider.errorOnUnhandledRejections(false);
+    }])
 
     .value('HttpTimeout', 20000)
 

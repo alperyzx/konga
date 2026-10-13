@@ -29,7 +29,6 @@ const legacyVendorScripts = [
   'bootstrap/dist/js/bootstrap.js',
   'angularSails/dist/ngsails.io.js',
   'ngstorage/ngStorage.js',
-  'bootswatch-dist/js/bootstrap.js',
   'angular-bootstrap/ui-bootstrap-tpls.js',
   'lodash/lodash.js',
   'bootstrap-switch/dist/js/bootstrap-switch.js',

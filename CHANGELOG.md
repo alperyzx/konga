@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 * Replaced Bower and the Grunt asset pipeline with a reproducible Webpack 5 build.
 * Vendored the exact proven AngularJS browser distributions and upstream license files, eliminating installation-time access to the retired Bower registry.
 * Added `KONGA_CA_FILE` support for secure npm/Node installation behind private certificate authorities and TLS inspection proxies.
+* Updated vendored jQuery, AngularJS, Bootstrap, UI-Router, and Moment distributions to their final security-maintained compatible releases.
+* Removed the duplicate Bootswatch copy of Bootstrap JavaScript and hardened AngularSails cookie-key escaping.
 
 ## [0.26.10]
 * Migrated the runtime to Sails 1 and Node.js 20.19+, including Passport 0.7 and Waterline compatibility fixes.

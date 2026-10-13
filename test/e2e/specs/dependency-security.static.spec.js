@@ -47,4 +47,19 @@ test.describe('security dependency upgrades', () => {
     expect(dependencies.uuid).toBe('^11.1.1');
     expect(dependencies.jsonwebtoken).toBe('^9.0.2');
   });
+
+  test('vendors patched legacy browser distributions without duplicate Bootstrap code', () => {
+    expect(read('assets/vendor/legacy/jquery/dist/jquery.js')).toContain('jQuery JavaScript Library v3.7.1');
+    expect(read('assets/vendor/legacy/angular/angular.js')).toContain('AngularJS v1.8.3');
+    expect(read('assets/vendor/legacy/bootstrap/dist/js/bootstrap.js')).toContain('Bootstrap v3.4.1');
+    expect(read('assets/vendor/legacy/angular-ui-router/release/angular-ui-router.js')).toContain('@version v0.4.3');
+    expect(read('assets/vendor/legacy/moment/moment.js')).toContain('version : 2.31.0');
+    expect(() => read('assets/vendor/legacy/bootswatch-dist/js/bootstrap.js')).toThrow();
+
+    const webpack = read('webpack.config.js');
+    expect(webpack).not.toContain("'bootswatch-dist/js/bootstrap.js'");
+
+    const app = read('assets/js/app/app.js');
+    expect(app).toContain('$qProvider.errorOnUnhandledRejections(false)');
+  });
 });
