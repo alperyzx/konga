@@ -1,5 +1,8 @@
 'use strict';
 
+var crypto = require('crypto');
+var sessionCookieName = 'konga-' + crypto.randomBytes(4).toString('hex') + '.sid';
+
 /**
  * Session Configuration
  * (sails.config.session)
@@ -14,6 +17,8 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.session.html
  */
 module.exports.session = {
+  name: sessionCookieName,
+
   /***************************************************************************
    *                                                                          *
    * Session secret is automatically generated when your new app is created   *
