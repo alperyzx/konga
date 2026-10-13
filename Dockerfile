@@ -3,7 +3,7 @@ FROM node:20-alpine AS dependencies
 RUN apk add --no-cache bash git ca-certificates openssl
 
 WORKDIR /app
-COPY package.json package-lock.json bower.json .bowerrc /app/
+COPY package.json package-lock.json /app/
 COPY vendor /app/vendor
 RUN npm ci
 COPY . /app

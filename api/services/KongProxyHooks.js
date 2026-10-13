@@ -198,7 +198,7 @@ var self = module.exports = {
         // the exiting upstream ids
         sails.models.upstreamalert.find({
           upstream_id : {
-            '!' : existingUpstreamIds
+            '!=' : existingUpstreamIds
           }
         }).exec((err, orphans) => {
           if(err) {
@@ -252,4 +252,3 @@ var self = module.exports = {
 
 
 }
-

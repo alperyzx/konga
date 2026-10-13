@@ -28,7 +28,7 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
                 if (err) return res.negotiate(err);
                 if(req.body.active && node.active != req.body.active) {
                     sails.models.kongnode.update({
-                        where: { id:{ '!': req.params.id } },
+                        where: { id:{ '!=': req.params.id } },
 
                     },{active:false}).fetch().exec(function afterwards(err, upd){
                         if (err) return res.negotiate(err);

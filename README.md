@@ -125,12 +125,13 @@ See the completed [Kong 3.9 parity plan](./docs/kong-parity-plan.html) for field
 
 Install `npm` and `node.js`. Instructions can be found [here](http://sailsjs.org/#/getStarted?q=what-os-do-i-need).
 
-Install the application dependencies. The npm post-install step installs the Bower assets.
+Install the locked npm dependencies. Browser dependencies are vendored with their licenses and
+compiled locally by Webpack, so installation does not contact the retired Bower registry.
 
 ```bash
-$ git clone https://github.com/pantsel/konga.git
+$ git clone https://github.com/alperyzx/konga.git
 $ cd konga
-$ npm install
+$ npm ci
 ```
 
 ## Configuration
@@ -158,6 +159,7 @@ These are the general environment variables Konga uses.
 | SSL_CRT_PATH       | If you want to use SSL, this will be the absolute path to the .crt file. Both `SSL_KEY_PATH` & `SSL_CRT_PATH` must be set. | -                                      | null                                         |
 | KONGA_HOOK_TIMEOUT | The time in ms that Konga will wait for startup tasks to finish before exiting the process.                                | -                                      | 60000                                        |
 | KONGA_ALLOWED_ORIGINS | Comma-separated browser origins allowed to open production WebSocket connections. Include Konga's public origin.       | `<origin>[,<origin>...]`                | `http://localhost:PORT,http://127.0.0.1:PORT` |
+| KONGA_CA_FILE      | CA bundle used by `run.sh` for npm/Node TLS on hosts behind a private certificate authority or inspection proxy.                         | `<path-to-pem>`                         | -                                            |
 | DB_ADAPTER         | The database that Konga will use. If not set, the localDisk db will be used.              | `mongo`,`mysql`,`postgres`     | -                                            |
 | DB_URI             | The full db connection string. Depends on `DB_ADAPTER`. If this is set, no other DB related var is needed.                 | -                                      | -                                            |
 | DB_HOST            | If `DB_URI` is not specified, this is the database host. Depends on `DB_ADAPTER`.                                          | -                                      | localhost                                    |
@@ -202,12 +204,12 @@ Konga GUI will be available at `http://localhost:1337`
 ### Local development helper
 
 This fork includes [`run.sh`](run.sh) for running Konga directly on
-the host. It checks the supported Node.js version, installs npm/Bower dependencies when needed,
+the host. It checks the supported Node.js version, installs locked npm dependencies when needed,
 and starts Konga on port `1337`.
 
 ```bash
 ./run.sh                 # install missing dependencies, then start Konga
-./run.sh --install       # reinstall/update npm and Bower dependencies first
+./run.sh --install       # cleanly reinstall package-lock.json dependencies first
 ./run.sh --production    # start with NODE_ENV=production
 ./run.sh --prepare postgres postgresql://user:pass@localhost:5432/konga
 ```
@@ -216,9 +218,17 @@ Konga is available at `http://localhost:1337`. The Kong Admin API connection is 
 inside Konga; the development setup used for parity testing is Kong at `localhost:8001` and
 the Kong Manager at `localhost:8002`.
 
-The launcher and asset builds are expected to start without deprecation or framework-configuration
+Application startup and Webpack asset builds are expected to complete without framework or Sass
 warnings. Sass notices suppressed by the build are limited to deprecated constructs in the bundled
-Bootstrap 3 and Bootswatch sources; application Sass warnings remain visible.
+Bootstrap 3 and Bootswatch sources; application Sass warnings remain visible. npm can still report
+deprecation notices for legacy runtime packages, which are distinct from audit vulnerabilities.
+
+On a host that uses a private CA or TLS inspection proxy, provide the trusted PEM bundle without
+disabling certificate validation:
+
+```bash
+KONGA_CA_FILE=/etc/pki/ca-trust/source/anchors/company-ca.pem ./run.sh --production
+```
 
 ### Production
 
@@ -353,8 +363,8 @@ every model-backed API—the request shape used by list pages such as Users, Con
 Snapshots.
 
 The static suite also guards the local startup configuration against retired Sails policy targets,
-deprecated response helpers, ambiguous wildcard routes, redundant Bower resolutions, and accidental
-rewrites of the tracked server layout during asset builds.
+deprecated response helpers, ambiguous wildcard routes, Bower regressions, and accidental rewrites
+of the tracked server layout during asset builds.
 
 For live Kong schema and browser tests, see the [browser test guide](./test/e2e/README.md).
 The UI suite requires Konga, Kong, an installed Chrome-family browser, and `KONGA_PASSWORD`.
@@ -390,10 +400,11 @@ docker run --rm pantsel/konga:latest -c prepare -a {{adapter}} -u {{connection-u
 
 ##### 1. Getting blank page with `Uncaught ReferenceError: angular is not defined`
 
-In some cases when running `npm install`, the bower dependencies are not installed properly.
-You will need to cd into your project's root directory and install them manually by typing
-```
-$ npm run bower-deps
+Reinstall the locked dependencies and rebuild the Webpack assets:
+
+```bash
+npm ci
+npm run build:prod
 ```
 
 ##### 2. Can't add/edit some plugin properties.
@@ -410,11 +421,10 @@ See issue [#48](https://github.com/pantsel/konga/issues/48) for reference.
 If you see this error while trying to run Konga, it means that Konga has no write permissions to
 its data directory. Set `STORAGE_PATH` to a directory that Konga can write to.
 
-##### 4. The hook `grunt` is taking too long to load
-The default timeout for the sails hooks to load is 60000. In some cases, depending on
-the memory the host machine has available, startup tasks like code minification and uglyfication
-may take longer to complete. You can fix that by setting then env var `KONGA_HOOK_TIMEOUT` to something
-greater than 60000, like 120000.
+##### 4. npm reports `UNABLE_TO_VERIFY_LEAF_SIGNATURE`
+
+Configure the root/intermediate CA used by your organization and pass its PEM bundle through
+`KONGA_CA_FILE`. Do not disable `strict-ssl` or set `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 
 
 ## More Kong related stuff

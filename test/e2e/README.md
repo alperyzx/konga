@@ -148,8 +148,9 @@ a crashed run leaves obviously-disposable litter that the next run clears.
 
 ## Editing `assets/` invalidates a UI run
 
-Sails 1 serves `.tmp/public/`, a copy Grunt creates from `assets/`. The obsolete
-watch task has been removed, so rebuild assets and restart Konga after an asset change:
+Sails 1 serves `.tmp/public/`, which the Webpack build creates from `assets/` and
+the committed browser dependencies in `assets/vendor/`. Rebuild assets and restart Konga after an
+asset change:
 
 ```bash
 npm run build

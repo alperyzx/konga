@@ -20,7 +20,7 @@ const APP_JS = path.join(REPO, 'assets', 'js', 'app');
 /** Every file under a directory, skipping vendored trees. */
 function walk(dir, filter, acc = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === 'bower_components' || entry.name === 'node_modules') continue;
+    if (entry.name === 'node_modules') continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(full, filter, acc);
     else if (filter(full)) acc.push(full);

@@ -36,7 +36,9 @@ test.describe('security dependency upgrades', () => {
     const dependencies = require(path.join(ROOT, 'package.json')).dependencies;
     expect(dependencies.passport).toBe('^0.7.0');
     expect(dependencies.validator).toBe('^13.15.35');
-    expect(dependencies.grunt).toBe('^1.6.3');
+    expect(dependencies.grunt).toBeUndefined();
+    expect(dependencies.bower).toBeUndefined();
+    expect(dependencies.webpack).toBe('5.111.1');
     expect(dependencies.sass).toBe('^1.105.1');
     expect(dependencies['node-sass']).toBeUndefined();
     expect(dependencies.unirest).toBeUndefined();

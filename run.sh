@@ -9,7 +9,7 @@ usage() {
   cat <<'EOF'
 Usage: ./run.sh [--install] [--production] [--prepare ADAPTER URI]
 
-  --install                 install npm and Bower dependencies first
+  --install                 reinstall locked npm dependencies first
   --production              start Konga in production mode
   --prepare ADAPTER URI    prepare a supported external database, then exit
 EOF
@@ -37,18 +37,22 @@ if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
   exit 1
 fi
 
+if [ -n "${KONGA_CA_FILE:-}" ]; then
+  if [ ! -r "$KONGA_CA_FILE" ]; then
+    echo "KONGA_CA_FILE is not readable: $KONGA_CA_FILE" >&2
+    exit 1
+  fi
+  export NODE_EXTRA_CA_CERTS="$KONGA_CA_FILE"
+  export npm_config_cafile="$KONGA_CA_FILE"
+fi
+
 if ! node -e "const [major, minor] = process.versions.node.split('.').map(Number); process.exit(major > 20 || (major === 20 && minor >= 19) ? 0 : 1)"; then
   echo "Unsupported Node.js version: $(node --version). Use Node.js 20.19 or newer." >&2
   exit 1
 fi
 
 if [ "$INSTALL" = true ] || [ ! -d node_modules ]; then
-  npm install
-fi
-
-if [ "$INSTALL" = true ] || [ ! -d bower_components ]; then
-  if ! command -v bower >/dev/null 2>&1; then npm install --global bower; fi
-  bower install
+  npm ci
 fi
 
 if [ -n "$PREPARE_ADAPTER" ]; then
