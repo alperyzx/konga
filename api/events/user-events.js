@@ -4,6 +4,7 @@ var events = require('events');
 var eventEmitter = new events.EventEmitter();
 var nodemailer = require('nodemailer');
 var mg = require('nodemailer-mailgun-transport');
+var Utils = require('../lib/utils');
 var sendmail = require('sendmail')({
     logger: {
         debug: sails.log,
@@ -76,7 +77,8 @@ module.exports = {
 
                     var baseUrl = settings.basePath || (req.protocol || 'http') + "://" + (req.get('host') || ('localhost:' + sails.config.port));
 
-                    var link = baseUrl +  '/auth/activate/' + user.activationToken;
+                    var link = baseUrl.replace(/\/$/, '') + '/auth/activate/' + encodeURIComponent(user.activationToken);
+                    var safeLink = Utils.escapeHtml(link);
 
                     var mailOptions = {
                         from: '"' + settings.email_default_sender_name + '" <' + settings.email_default_sender + '>', // sender address
@@ -84,7 +86,7 @@ module.exports = {
                         subject: 'Welcome to Konga', // Subject line
                         html: '<h2>Welcome to Konga!</h2>' +
                         '<p>In order to activate your account, follow the link:</p>' +
-                        '<p><a href="' + link + '">' + link + '</a></p>'
+                        '<p><a href="' + safeLink + '">' + safeLink + '</a></p>'
                     };
 
                     if(settings.default_transport == 'sendmail') {

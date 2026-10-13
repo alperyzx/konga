@@ -90,4 +90,13 @@ module.exports = {
     if(!str) return str;
     return str.replace(/\/$/, "")
   },
+
+  escapeHtml: function (value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  },
 }

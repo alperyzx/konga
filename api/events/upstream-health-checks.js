@@ -328,10 +328,10 @@ module.exports = {
           '<table style="border: 1px solid #ccc;background-color: #eaeaea">' +
           '<tr>' +
           '<th style="text-align: left">Name</th>' +
-          '<td style="text-align: left">' + connection.name + '</td>' +
+          '<td style="text-align: left">' + Utils.escapeHtml(connection.name) + '</td>' +
           '</tr>' +
           '<th style="text-align: left">URL</th>' +
-          '<td style="text-align: left">' + connection.kong_admin_url + '</td>' +
+          '<td style="text-align: left">' + Utils.escapeHtml(connection.kong_admin_url) + '</td>' +
           '</tr>' +
           '</table>' +
 
@@ -345,9 +345,9 @@ module.exports = {
 
         unhealthyTargets.forEach(target => {
            const row = '<tr>' +
-             '<td>' + _.get(target, 'upstream.id', 'N/A') + '</td>' +
-             '<td>' + target.target + '</td>' +
-             '<td>' + target.health + '</td>' +
+             '<td>' + Utils.escapeHtml(_.get(target, 'upstream.id', 'N/A')) + '</td>' +
+             '<td>' + Utils.escapeHtml(target.target) + '</td>' +
+             '<td>' + Utils.escapeHtml(target.health) + '</td>' +
              '</tr>';
 
            html += row;

@@ -196,4 +196,23 @@ describe('CodeQL security remediations', function () {
     assert.match(source, /crypto\.randomBytes\(32\)/);
     assert.doesNotMatch(source + configSource, /oursecret|8fe171f1-0046-4df5-9216-14099434339f|some_secret_token/);
   });
+
+  it('escapes values inserted into notification HTML', function () {
+    const source = fs.readFileSync(path.resolve(
+      __dirname,
+      '../../api/lib/utils.js'
+    ), 'utf8');
+    const securitySource = fs.readFileSync(path.resolve(
+      __dirname,
+      '../../config/security.js'
+    ), 'utf8');
+    const userEventsSource = fs.readFileSync(path.resolve(
+      __dirname,
+      '../../api/events/user-events.js'
+    ), 'utf8');
+
+    assert.match(source, /escapeHtml/);
+    assert.doesNotMatch(securitySource, /allowOrigins:\s*['"]\*['"]/);
+    assert.match(userEventsSource, /Utils\.escapeHtml\(link\)/);
+  });
 });

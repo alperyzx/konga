@@ -281,11 +281,11 @@ module.exports = {
             '<table style="border: 1px solid #ccc;background-color: #eaeaea">' +
             '<tr>' +
             '<th style="text-align: left">Id</th>' +
-            '<td style="text-align: left">' + hc.id + '</td>' +
+            '<td style="text-align: left">' + Utils.escapeHtml(hc.id) + '</td>' +
             '</tr>' +
             '<tr>' +
             '<th style="text-align: left">Name</th>' +
-            '<td style="text-align: left">' + hc.api.name + '</td>' +
+            '<td style="text-align: left">' + Utils.escapeHtml(hc.api.name) + '</td>' +
             '</tr>' +
             '</table>';
 

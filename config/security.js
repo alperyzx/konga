@@ -27,6 +27,13 @@
  *  http://sailsjs.org/#/documentation/reference/sails.config/sails.config.cors.html
  *
  */
+var port = process.env.PORT || 1337;
+var allowedOrigins = (process.env.KONGA_ALLOWED_ORIGINS ||
+  'http://localhost:' + port + ',http://127.0.0.1:' + port)
+  .split(',')
+  .map(function(origin) { return origin.trim(); })
+  .filter(Boolean);
+
 module.exports.security = {
   cors: {
   /***************************************************************************
@@ -46,7 +53,7 @@ module.exports.security = {
    * "*" to allow all domains CORS access.                                    *
    *                                                                          *
    ***************************************************************************/
-  allowOrigins: '*',
+  allowOrigins: allowedOrigins,
 
   /***************************************************************************
    *                                                                          *
