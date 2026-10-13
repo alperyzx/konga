@@ -213,6 +213,6 @@ describe('CodeQL security remediations', function () {
 
     assert.match(source, /escapeHtml/);
     assert.doesNotMatch(securitySource, /allowOrigins:\s*['"]\*['"]/);
-    assert.match(userEventsSource, /Utils\.escapeHtml\(link\)/);
+    assert.match(userEventsSource, /_\.escape\(link\)/);
   });
 });

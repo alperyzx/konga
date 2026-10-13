@@ -2,6 +2,7 @@
 
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
+var _ = require('lodash');
 var nodemailer = require('nodemailer');
 var mg = require('nodemailer-mailgun-transport');
 var Utils = require('../lib/utils');
@@ -78,7 +79,7 @@ module.exports = {
                     var baseUrl = settings.basePath || (req.protocol || 'http') + "://" + (req.get('host') || ('localhost:' + sails.config.port));
 
                     var link = baseUrl.replace(/\/$/, '') + '/auth/activate/' + encodeURIComponent(user.activationToken);
-                    var safeLink = Utils.escapeHtml(link);
+                    var safeLink = _.escape(link);
 
                     var mailOptions = {
                         from: '"' + settings.email_default_sender_name + '" <' + settings.email_default_sender + '>', // sender address

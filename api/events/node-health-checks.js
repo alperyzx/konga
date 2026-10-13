@@ -266,20 +266,20 @@ module.exports = {
 
         var duration = moment.duration(moment().diff(moment(tasks[node.id].lastSucceeded))).humanize()
 
-                var html = '<h3>A Kong Node health check is failing for more than ' + Utils.escapeHtml(duration) + '</h3>' +
-                    '<h4>' + Utils.escapeHtml(_.get(tasks, `${node.id}.lastFailedReason`, 'N/A')) + '</h4>' +
+                var html = '<h3>A Kong Node health check is failing for more than ' + _.escape(duration) + '</h3>' +
+                    '<h4>' + _.escape(_.get(tasks, `${node.id}.lastFailedReason`, 'N/A')) + '</h4>' +
             '<table style="border: 1px solid #ccc;background-color: #eaeaea">' +
             '<tr>' +
             '<th style="text-align: left">Id</th>' +
-            '<td style="text-align: left">' + Utils.escapeHtml(node.id) + '</td>' +
+            '<td style="text-align: left">' + _.escape(node.id) + '</td>' +
             '</tr>' +
             '<tr>' +
             '<th style="text-align: left">Name</th>' +
-            '<td style="text-align: left">' + Utils.escapeHtml(node.name) + '</td>' +
+            '<td style="text-align: left">' + _.escape(node.name) + '</td>' +
             '</tr>' +
             '<tr>' +
             '<th style="text-align: left">Kong Admin URL</th>' +
-            '<td style="text-align: left">' + Utils.escapeHtml(node.kong_admin_url) + '</td>' +
+            '<td style="text-align: left">' + _.escape(node.kong_admin_url) + '</td>' +
             '</tr>' +
             '</table>';
 
