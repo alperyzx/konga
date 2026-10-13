@@ -13,6 +13,9 @@
 
 var fs = require('fs');
 var port = process.env.PORT || 1337;
+var hookTimeout = process.env.KONGA_HOOK_TIMEOUT
+  ? Number(process.env.KONGA_HOOK_TIMEOUT)
+  : 60000;
 var allowedOrigins = (process.env.KONGA_ALLOWED_ORIGINS ||
   'http://localhost:' + port + ',http://127.0.0.1:' + port)
   .split(',')
@@ -25,7 +28,7 @@ module.exports = {
    * environment (see config/datastores.js and config/models.js )            *
    ***************************************************************************/
 
-  hookTimeout: process.env.KONGA_HOOK_TIMEOUT || 60000,
+  hookTimeout: hookTimeout,
 
   // kong_admin_url : process.env.KONG_ADMIN_URL || 'http://127.0.0.1:8001',
 
