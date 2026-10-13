@@ -35,6 +35,8 @@
 (function() {
   'use strict';
 
+  var nextSearchId = 0;
+
   angular.module('frontend.core.directives')
     .directive('listSearch', function directive() {
       return {
@@ -49,7 +51,7 @@
         controller: [
           '$scope','$rootScope',
           function controller($scope,$rootScope) {
-            $scope.id = Math.floor((Math.random() * 6) + 1);
+            $scope.id = ++nextSearchId;
 
             $scope.inSearch = function inSearch(item) {
               return (!angular.isUndefined(item.searchable)) ? item.searchable : false;

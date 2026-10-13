@@ -215,4 +215,14 @@ describe('CodeQL security remediations', function () {
     assert.doesNotMatch(securitySource, /allowOrigins:\s*['"]\*['"]/);
     assert.match(userEventsSource, /_\.escape\(link\)/);
   });
+
+  it('does not use insecure randomness for UI identifiers', function () {
+    const source = fs.readFileSync(path.resolve(
+      __dirname,
+      '../../assets/js/app/core/directives/ListSearch.js'
+    ), 'utf8');
+
+    assert.doesNotMatch(source, /Math\.random\(/);
+    assert.match(source, /nextSearchId/);
+  });
 });
