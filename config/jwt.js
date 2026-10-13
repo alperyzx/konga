@@ -2,7 +2,7 @@
 
 module.exports = {
   jwt: {
-    secret: '8fe171f3-0046-4df5-9216-14099434339f',
+    secret: process.env.TOKEN_SECRET,
     sign: {
       algorithm: 'HS512',
       expiresInMinutes: 1,

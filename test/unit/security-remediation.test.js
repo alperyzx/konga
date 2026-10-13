@@ -182,4 +182,18 @@ describe('CodeQL security remediations', function () {
     assert.doesNotMatch(source, /child_process['"]\)\.exec\b/);
     assert.doesNotMatch(source, /\bcd ['"]? \+/);
   });
+
+  it('does not use a hard-coded JWT signing secret', function () {
+    const source = fs.readFileSync(path.resolve(
+      __dirname,
+      '../../api/services/Token.js'
+    ), 'utf8');
+    const configSource = fs.readFileSync(path.resolve(
+      __dirname,
+      '../../config/jwt.js'
+    ), 'utf8');
+
+    assert.match(source, /crypto\.randomBytes\(32\)/);
+    assert.doesNotMatch(source + configSource, /oursecret|8fe171f1-0046-4df5-9216-14099434339f|some_secret_token/);
+  });
 });
