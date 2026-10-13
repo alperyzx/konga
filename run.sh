@@ -60,7 +60,8 @@ if [ -n "$PREPARE_ADAPTER" ]; then
   exit $?
 fi
 
-echo "Starting native Konga at http://localhost:${PORT:-1337}"
+DISPLAY_PORT="$(node -e "require('dotenv').config(); process.stdout.write(process.env.PORT || '1337')")"
+echo "Starting native Konga at http://localhost:${DISPLAY_PORT}"
 if [ "$PRODUCTION" = true ]; then
   npm run production
 else
