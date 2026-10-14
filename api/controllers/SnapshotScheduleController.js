@@ -35,15 +35,17 @@ module.exports = _.merge(_.cloneDeep(require('../base/Controller')), {
             }
 
 
-            sails.models.snapshotschedule.create(req.body)
+            sails.models.snapshotschedule.create(req.body).fetch()
                 .exec(function (err,created) {
                     if(err) {
                         return res.negotiate(err);
                     }
 
-
-                    if(created.active) { // Start cron job immediately
-
+                    if(!created) {
+                        sails.log.error('SnapshotScheduleController:create: Schedule was not returned after creation');
+                        return res.serverError({
+                            message: 'The schedule was created, but its details could not be returned.'
+                        });
                     }
 
                     return res.json(created);

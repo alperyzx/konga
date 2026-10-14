@@ -28,9 +28,13 @@ module.exports = function hook(sails) {
             .exec(function(err,data){
                 if(!err && data.length){
                     data.forEach(function(schedule){
-                        SnapshotScheduler.add(schedule);
-                    });
+                try {
+                    SnapshotScheduler.add(schedule);
+                } catch (schedulerError) {
+                    sails.log.error('Hook:start-scheduled-snapshots: Failed to start schedule', schedulerError);
                 }
+            });
+        }
             });
 
 

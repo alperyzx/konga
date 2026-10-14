@@ -66,7 +66,11 @@ var defaultModel = _.merge(_.cloneDeep(require('../base/Model')), {
 
         if(values.active) {
             // Start cron job
-            Scheduler.add(values);
+            try {
+                Scheduler.add(values);
+            } catch (err) {
+                sails.log.error("SnapshotSchedule:afterCreate: Failed to start schedule", err);
+            }
         }
 
         cb();

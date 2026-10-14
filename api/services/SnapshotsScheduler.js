@@ -16,34 +16,45 @@ module.exports = {
 
       sails.log.debug("SnapshotScheduler:add", schedule);
 
-      tasks[schedule.id] = cron.schedule(schedule.cron, function () {
-        sails.log.debug("SnapshotScheduler:Running scheduled task", schedule);
+      try {
+        tasks[schedule.id] = cron.schedule(schedule.cron, function () {
+          sails.log.debug("SnapshotScheduler:Running scheduled task", schedule);
 
-        sails.models.kongnode.findOne(schedule.connection.id || schedule.connection)
-          .exec(function (err, node) {
-            if (err) {
-              sails.log.error("SnapshotScheduler:Running scheduled task", "Failed to get node", err);
-              return false;
-            }
+          var connectionId = schedule.connection && (schedule.connection.id || schedule.connection);
+          if (!connectionId) {
+            sails.log.error("SnapshotScheduler:Running scheduled task", "Schedule has no connection", schedule);
+            return;
+          }
 
-            if (!node) {
-              sails.log.warn("SnapshotScheduler:Running scheduled task", "Node not found", schedule.connection);
-              return false;
-            }
+          sails.models.kongnode.findOne(connectionId)
+            .exec(function (err, node) {
+              if (err) {
+                sails.log.error("SnapshotScheduler:Running scheduled task", "Failed to get node", err);
+                return;
+              }
 
-            sails.log.error("SnapshotScheduler:Running scheduled task", "Fetch node", node);
+              if (!node) {
+                sails.log.warn("SnapshotScheduler:Running scheduled task", "Node not found", schedule.connection);
+                return;
+              }
 
-            SnapshotsService.snapshot(null, node, {
-              includeSensitiveData: schedule.include_sensitive_data === true
-            }).catch(function (snapshotError) {
-              sails.log.error('SnapshotScheduler:Snapshot creation failed', snapshotError);
+              sails.log.debug("SnapshotScheduler:Running scheduled task", "Fetch node", node);
+
+              SnapshotsService.snapshot(null, node, {
+                includeSensitiveData: schedule.include_sensitive_data === true
+              }).catch(function (snapshotError) {
+                sails.log.error('SnapshotScheduler:Snapshot creation failed', snapshotError);
+              });
             });
 
-          });
+        }, false);
 
-      }, false);
-
-      tasks[schedule.id].start();
+        tasks[schedule.id].start();
+      } catch (error) {
+        delete tasks[schedule.id];
+        sails.log.error('SnapshotScheduler:add: Failed to start schedule', error);
+        throw error;
+      }
     } else {
       sails.log.debug("SnapshotScheduler:add", "A schedule with the same id already exists");
     }
