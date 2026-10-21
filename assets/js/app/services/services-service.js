@@ -63,7 +63,7 @@
             if (Semver.cmp(version, "2.0.0") >= 0) {
               props.tls_verify = null;
               props.tls_verify_depth = null;
-              props.ca_certificates = [];
+              props.ca_certificates = null;
             }
 
             return props;
