@@ -1,0 +1,12 @@
+# CodeQL configuration shared by code scanning (see .github/workflows/codeql.yml).
+#
+# All findings under assets/vendor/legacy are located in third-party,
+# intentionally pinned legacy browser distributions that are bundled verbatim
+# into min/vendor.min.js (see webpack.config.js). They are audited during
+# upgrade work (see test/e2e/specs/dependency-security.static.spec.js) and are
+# deliberately kept out of this scanner's alert surface.
+paths-ignore:
+  - assets/vendor/legacy
+
+# Preserve the "remote" threat model previously selected in the default setup UI.
+threat-model: remote
