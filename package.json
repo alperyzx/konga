@@ -68,7 +68,7 @@
     "node": ">=20.19.0"
   },
   "overrides": {
-    "body-parser": "1.20.8",
+    "body-parser": "1.20.9",
     "compression": "1.8.2",
     "findup-sync": "$findup-sync",
     "i18n-2": "$i18n-2",
